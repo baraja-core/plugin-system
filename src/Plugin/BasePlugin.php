@@ -145,7 +145,7 @@ abstract class BasePlugin implements Plugin
 	final public function link(string $route = 'Homepage:default', array $params = []): string
 	{
 		if ($this->linkGenerator === null) {
-			throw new \RuntimeException('Link generator failed: Service for "' . \get_class(PluginLinkGenerator::class) . '" does not registered. Did you install baraja-core/cms?');
+			throw new \RuntimeException('Link generator failed: Service for "' . PluginLinkGenerator::class . '" does not registered. Did you install baraja-core/cms?');
 		}
 
 		return $this->linkGenerator->link($route, $params);
