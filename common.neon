@@ -1,0 +1,14 @@
+extensions:
+	pluginComponent: Baraja\Plugin\PluginComponentExtension
+
+services:
+	pluginManager:
+		factory: Baraja\Plugin\PluginManager
+	- Baraja\Plugin\CmsPluginPanel
+
+search:
+	shopUpPlugins:
+		in: %rootDir%
+		files: ['*Plugin.php']
+		implements: Baraja\Plugin\Plugin
+		tags: ['baraja-plugin']
