@@ -42,8 +42,8 @@ abstract class BasePlugin implements Plugin
 	/** @var mixed[] */
 	private $smartControlComponentParams = [];
 
-	/** @var PluginLinkGenerator|null */
-	private $linkGenerator;
+	/** @var Context */
+	private $context;
 
 
 	final public function run(): void
@@ -144,11 +144,11 @@ abstract class BasePlugin implements Plugin
 	 */
 	final public function link(string $route = 'Homepage:default', array $params = []): string
 	{
-		if ($this->linkGenerator === null) {
+		if (($linkGenerator = $this->context->getLinkGenerator()) === null) {
 			throw new \RuntimeException('Link generator failed: Service for "' . PluginLinkGenerator::class . '" does not registered. Did you install baraja-core/cms?');
 		}
 
-		return $this->linkGenerator->link($route, $params);
+		return $linkGenerator->link($route, $params);
 	}
 
 
@@ -275,8 +275,8 @@ abstract class BasePlugin implements Plugin
 	}
 
 
-	final public function setLinkGenerator(PluginLinkGenerator $linkGenerator): void
+	final public function setContext(Context $context): void
 	{
-		$this->linkGenerator = $linkGenerator;
+		$this->context = $context;
 	}
 }
