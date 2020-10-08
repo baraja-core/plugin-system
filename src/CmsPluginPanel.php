@@ -77,21 +77,7 @@ final class CmsPluginPanel implements IBarPanel
 
 	public function getTab(): string
 	{
-		return '<span title="CMS components">'
-			. '<img alt="CMS components" src="'
-			. 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pjxzdmcgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5k'
-			. 'Om5ldyAwIDAgNTAgNTA7IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCA1MCA1MCIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgeG1sbnM9'
-			. 'Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+PGcgaWQ9'
-			. 'IkxheWVyXzEiPjxwYXRoIGQ9Ik01LDMydjE3aDMwLjM0M2wyLjE2Ny0xLjY4NkM0Mi4yNyw0My42MTIsNDUsMzguMDMsNDUsMzJ2LTAu'
-			. 'NjQ5bC04Ljg0MS0zLjkzMWMtMS41OS00LjIyNS01LjIyOS03LjI2Mi05LjU1LTguMTQ3ICAgQzI5LjI1NywxNy40NzIsMzEsMTQuNDM2'
-			. 'LDMxLDExYzAtNS41MTQtNC40ODYtMTAtMTAtMTBTMTEsNS40ODYsMTEsMTFjMCwzLjQzMSwxLjczOSw2LjQ2NCw0LjM4LDguMjY1Qzku'
-			. 'NDY0LDIwLjQ4MSw1LDI1LjcyOSw1LDMyICAgeiBNNDIuOTg4LDMyLjY0NWMtMC4xODcsNS4xNi0yLjYwNyw5LjkwMy02LjcwNywxMy4w'
-			. 'OTJMMzUsNDYuNzMzbC0xLjI4MS0wLjk5N2MtNC4xLTMuMTg4LTYuNTIxLTcuOTMyLTYuNzA3LTEzLjA5Mmw3Ljk5LTMuNTUgICBMNDIu'
-			. 'OTg4LDMyLjY0NXogTTEzLDExYzAtNC40MTEsMy41ODktOCw4LThzOCwzLjU4OSw4LDhzLTMuNTg5LDgtOCw4UzEzLDE1LjQxMSwxMywx'
-			. 'MXogTTE4LDIxaDZjNC4zMTIsMCw4LjE3MywyLjUxNyw5Ljk2MSw2LjM2NyAgIEwyNSwzMS4zNTFWMzJjMCw1Ljg2NSwyLjU4OSwxMS4z'
-			. 'LDcuMTA5LDE1SDdWMzJDNywyNS45MzUsMTEuOTM1LDIxLDE4LDIxeiIvPjxwb2x5Z29uIHBvaW50cz0iMzYsMzMgMzQsMzMgMzQsMzYg'
-			. 'MzEsMzYgMzEsMzggMzQsMzggMzQsNDEgMzYsNDEgMzYsMzggMzksMzggMzksMzYgMzYsMzYgICIvPjwvZz48Zy8+PC9zdmc+" '
-			. 'style="height:16px"></span>';
+		return 'CMS' . ($this->plugin !== null && $this->view !== null ? '&nbsp;' . htmlspecialchars($this->plugin) . ':' . htmlspecialchars($this->view) : '');
 	}
 
 
@@ -155,7 +141,7 @@ final class CmsPluginPanel implements IBarPanel
 			. $plugins
 			. '</table><br>'
 			. '<table>'
-			. '<tr><th style="width:24px"></th><th>Component</th><th>Name</th><th>Implements</th><th>View</th><th>Position</th><th>Params</th></tr>'
+			. '<tr><th style="width:24px"></th><th>Component</th><th>Call&nbsp;name</th><th>Implements</th><th>View</th><th>Position</th><th>Params</th></tr>'
 			. $components
 			. '</table>'
 			. '</div></div>';
