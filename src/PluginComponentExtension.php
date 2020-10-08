@@ -18,17 +18,33 @@ class PluginComponentExtension extends CompilerExtension
 	private const SERVICE_PREFIX = 'baraja.pluginSystem.';
 
 
+	public static function defineBasicServices(ContainerBuilder $builder): void
+	{
+		static $defined = false;
+
+		if ($defined === false) {
+			$defined = true;
+
+			$builder->addDefinition(self::SERVICE_PREFIX . 'context')
+				->setFactory(Context::class);
+
+			$builder->addDefinition(self::SERVICE_PREFIX . 'pluginManager')
+				->setFactory(PluginManager::class);
+		}
+	}
+
+
 	/**
 	 * Compress full plugin configuration to simple array structure and save in DIC.
 	 */
 	public function beforeCompile(): void
 	{
-		$builder = $this->getContainerBuilder();
+		self::defineBasicServices($builder = $this->getContainerBuilder());
 
 		$pluginServices = $this->createPluginServices($builder);
 
-		$pluginManager = $builder->addDefinition(self::SERVICE_PREFIX . 'pluginManager')
-			->setFactory(PluginManager::class);
+		/** @var ServiceDefinition $pluginManager */
+		$pluginManager = $this->getContainerBuilder()->getDefinitionByType(PluginManager::class);
 
 		$builder->addDefinition(self::SERVICE_PREFIX . 'cmsPluginPanel')
 			->setFactory(CmsPluginPanel::class);
@@ -112,9 +128,6 @@ class PluginComponentExtension extends CompilerExtension
 	 */
 	private function createPluginServices(ContainerBuilder $builder): array
 	{
-		$builder->addDefinition(self::SERVICE_PREFIX . 'context')
-			->setFactory(Context::class);
-
 		$robot = new RobotLoader;
 		$robot->addDirectory($rootDir = dirname(__DIR__, 4));
 		$robot->setTempDirectory($rootDir . '/temp/cache/baraja.pluginSystem');
