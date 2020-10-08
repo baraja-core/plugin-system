@@ -10,6 +10,7 @@ use Baraja\Plugin\Component\PluginComponent;
 use Baraja\Plugin\Component\VueComponent;
 use Nette\DI\CompilerExtension;
 use Nette\DI\ContainerBuilder;
+use Nette\DI\Definitions\ServiceDefinition;
 use Nette\Loaders\RobotLoader;
 use Nette\Utils\Strings;
 
@@ -44,7 +45,7 @@ class PluginComponentExtension extends CompilerExtension
 		$pluginServices = $this->createPluginServices($builder);
 
 		/** @var ServiceDefinition $pluginManager */
-		$pluginManager = $this->getContainerBuilder()->getDefinitionByType(PluginManager::class);
+		$pluginManager = $builder->getDefinitionByType(PluginManager::class);
 
 		$builder->addDefinition(self::SERVICE_PREFIX . 'cmsPluginPanel')
 			->setFactory(CmsPluginPanel::class);
