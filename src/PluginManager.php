@@ -122,9 +122,19 @@ final class PluginManager
 	 * @internal use in DIC
 	 * @param mixed[] $components
 	 */
-	public function setComponents(array $components): void
+	public function addComponents(array $components): void
 	{
-		$this->components = $components;
+		$this->components = array_merge($this->components, $components);
+	}
+
+
+	/**
+	 * @internal use in DIC
+	 * @param mixed[] $component
+	 */
+	public function addComponent(array $component): void
+	{
+		$this->components[] = $component;
 	}
 
 

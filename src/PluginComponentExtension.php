@@ -5,23 +5,38 @@ declare(strict_types=1);
 namespace Baraja\Plugin;
 
 
+use Baraja\Plugin\Component\ComponentDIDefinition;
 use Baraja\Plugin\Component\PluginComponent;
 use Baraja\Plugin\Component\VueComponent;
 use Nette\DI\CompilerExtension;
-use Nette\DI\Definitions\ServiceDefinition;
+use Nette\DI\ContainerBuilder;
+use Nette\Loaders\RobotLoader;
 use Nette\Utils\Strings;
 
 class PluginComponentExtension extends CompilerExtension
 {
+	private const SERVICE_PREFIX = 'baraja.pluginSystem.';
+
 
 	/**
 	 * Compress full plugin configuration to simple array structure and save in DIC.
 	 */
 	public function beforeCompile(): void
 	{
+		$builder = $this->getContainerBuilder();
+
+		$pluginServices = $this->createPluginServices($builder);
+
+		$pluginManager = $builder->addDefinition(self::SERVICE_PREFIX . 'pluginManager')
+			->setFactory(PluginManager::class);
+
+		$builder->addDefinition(self::SERVICE_PREFIX . 'cmsPluginPanel')
+			->setFactory(CmsPluginPanel::class);
+
 		if (PHP_SAPI === 'cli') {
 			return;
 		}
+
 		$components = [];
 		foreach ($this->config ?? [] as $key => $component) {
 			if (\is_string($key) === false) {
@@ -74,22 +89,64 @@ class PluginComponentExtension extends CompilerExtension
 				}
 				$params[] = Strings::firstLower($parameter);
 			}
-			$components[] = [
-				'key' => $key,
-				'name' => trim(trim($name) === '' ? $key : $name),
-				'implements' => $implements,
-				'componentClass' => $component['componentClass'] ?? VueComponent::class,
-				'view' => $view,
-				'source' => $source,
-				'position' => (int) ($component['position'] ?? 1),
-				'tab' => (string) ($component['tab'] ?? $key),
-				'params' => $params,
-			];
+			$components[] = (new ComponentDIDefinition(
+				$key,
+				trim(trim($name) === '' ? $key : $name),
+				$implements,
+				$component['componentClass'] ?? VueComponent::class,
+				$view,
+				$source,
+				(int) ($component['position'] ?? 1),
+				(string) ($component['tab'] ?? $key),
+				$params
+			))->toArray();
 		}
 
-		/** @var ServiceDefinition $pluginManager */
-		$pluginManager = $this->getContainerBuilder()->getDefinitionByType(PluginManager::class);
-		$pluginManager->addSetup('?->setPluginServices(array_keys($this->findByTag(\'baraja-plugin\')))', ['@self']);
-		$pluginManager->addSetup('?->setComponents(?)', ['@self', $components]);
+		$pluginManager->addSetup('?->setPluginServices(?)', ['@self', $pluginServices]);
+		$pluginManager->addSetup('?->addComponents(?)', ['@self', $components]);
+	}
+
+
+	/**
+	 * @return string[]
+	 */
+	private function createPluginServices(ContainerBuilder $builder): array
+	{
+		$builder->addDefinition(self::SERVICE_PREFIX . 'context')
+			->setFactory(Context::class);
+
+		$robot = new RobotLoader;
+		$robot->addDirectory($rootDir = dirname(__DIR__, 4));
+		$robot->setTempDirectory($rootDir . '/temp/cache/baraja.pluginSystem');
+		$robot->acceptFiles = ['*Plugin.php'];
+		$robot->reportParseErrors(false);
+		$robot->refresh();
+
+		$return = [];
+		foreach (array_unique(array_keys($robot->getIndexedClasses())) as $class) {
+			if (!class_exists($class) && !interface_exists($class) && !trait_exists($class)) {
+				throw new \RuntimeException('Class "' . $class . '" was found, but it cannot be loaded by autoloading.' . "\n" . 'More information: https://php.baraja.cz/autoloading-trid');
+			}
+			try {
+				$rc = new \ReflectionClass($class);
+			} catch (\ReflectionException $e) {
+				throw new \RuntimeException('Service "' . $class . '" is broken: ' . $e->getMessage(), $e->getCode(), $e);
+			}
+			if ($rc->isInstantiable() && $rc->implementsInterface(Plugin::class)) {
+				$plugin = $builder->addDefinition(self::SERVICE_PREFIX . 'plugin.' . str_replace('\\', '.', $class))
+					->setFactory($class)
+					->addTag('baraja-plugin');
+
+				$return[] = $plugin->getName();
+
+				if ($rc->hasMethod('setContext') === true) {
+					$plugin->addSetup('?->setContext(?)', ['@self', '@' . Context::class]);
+				} else {
+					user_error('Possible bug: Plugin "' . $class . '" do not extends "' . BasePlugin::class . '". Please check your dependency tree.');
+				}
+			}
+		}
+
+		return $return;
 	}
 }
