@@ -69,8 +69,7 @@ class VueComponent implements PluginComponent
 			$params[] = $this->escapeHtmlAttr($param) . '="' . $this->escapeHtmlAttr($paramValue) . '"';
 		}
 
-		return '<!-- component ' . $this->escapeHtmlComment($this->key) . ' -->' . "\n"
-			. '<' . $component . ($params !== [] ? ' ' . implode(' ', $params) : '') . '>'
+		return '<' . $component . ($params !== [] ? ' ' . implode(' ', $params) : '') . '>'
 			. '</' . $component . '>';
 	}
 
@@ -112,23 +111,5 @@ class VueComponent implements PluginComponent
 		}
 
 		return htmlspecialchars($s, ENT_QUOTES, 'UTF-8', $double);
-	}
-
-
-	/**
-	 * Escapes string for use inside HTML comments.
-	 */
-	private function escapeHtmlComment(string $s): string
-	{
-		if ($s && (strpos($s, '-') === 0 || strpos($s, '>') === 0 || strpos($s, '!') === 0)) {
-			$s = ' ' . $s;
-		}
-
-		$s = str_replace('--', '- - ', $s);
-		if (substr($s, -1) === '-') {
-			$s .= ' ';
-		}
-
-		return $s;
 	}
 }
