@@ -37,9 +37,9 @@ class VueComponent implements PluginComponent
 	{
 		$this->key = (string) $config['key'];
 		$this->name = (string) $config['name'];
-		$this->tab = (string) $config['tab'];
+		$this->tab = (string) ($config['tab'] ?? $config['key']);
 		$this->source = (string) $config['source'];
-		$this->position = (int) $config['position'];
+		$this->position = (int) ($config['position'] ?? 50);
 
 		$parameters = [];
 		foreach ($config['params'] ?? [] as $parameter) {
