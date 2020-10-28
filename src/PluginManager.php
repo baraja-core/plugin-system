@@ -107,7 +107,7 @@ final class PluginManager
 			}
 		}
 
-		usort($return, fn(PluginComponent $a, PluginComponent $b): int => $a->getPosition() < $b->getPosition() ? 1 : -1);
+		usort($return, fn (PluginComponent $a, PluginComponent $b): int => $a->getPosition() < $b->getPosition() ? 1 : -1);
 
 		return $return;
 	}
