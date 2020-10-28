@@ -16,25 +16,23 @@ final class PluginManager
 {
 
 	/** @var mixed[] */
-	private $components = [];
+	private array $components = [];
 
 	/** @var mixed[]|null */
-	private $pluginInfo;
+	private ?array $pluginInfo;
 
 	/** @var string[] */
-	private $baseEntityToPlugin;
+	private array $baseEntityToPlugin;
 
 	/** @var string[] */
-	private $baseEntitySimpleToPlugin;
+	private array $baseEntitySimpleToPlugin;
 
 	/** @var string[] (name => type) */
-	private $pluginNameToType;
+	private array $pluginNameToType;
 
-	/** @var Cache */
-	private $cache;
+	private Cache $cache;
 
-	/** @var Container */
-	private $container;
+	private Container $container;
 
 
 	public function __construct(Container $container, IStorage $storage)
@@ -47,13 +45,12 @@ final class PluginManager
 	/**
 	 * Effective all Plugin services setter.
 	 *
-	 * @internal use in DIC
 	 * @param string[] $pluginServices
+	 * @internal use in DIC
 	 */
 	public function setPluginServices(array $pluginServices): void
 	{
 		$cache = $this->cache->load('plugin-info');
-
 		if ($cache === null || ((string) ($cache['hash'] ?? '')) !== $this->getPluginServicesHash($pluginServices)) {
 			$info = $this->processPluginInfo($pluginServices);
 			$nameToType = [];
@@ -110,17 +107,15 @@ final class PluginManager
 			}
 		}
 
-		usort($return, static function (PluginComponent $a, PluginComponent $b): int {
-			return $a->getPosition() < $b->getPosition() ? 1 : -1;
-		});
+		usort($return, fn(PluginComponent $a, PluginComponent $b): int => $a->getPosition() < $b->getPosition() ? 1 : -1);
 
 		return $return;
 	}
 
 
 	/**
-	 * @internal use in DIC
 	 * @param mixed[] $components
+	 * @internal use in DIC
 	 */
 	public function addComponents(array $components): void
 	{
@@ -129,8 +124,8 @@ final class PluginManager
 
 
 	/**
-	 * @internal use in DIC
 	 * @param mixed[] $component
+	 * @internal use in DIC
 	 */
 	public function addComponent(array $component): void
 	{
@@ -191,7 +186,6 @@ final class PluginManager
 	public function getPluginByType(string $type): Plugin
 	{
 		$service = $this->container->getByType($type);
-
 		if ($service instanceof Plugin) {
 			return $service;
 		}

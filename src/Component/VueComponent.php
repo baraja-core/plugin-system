@@ -10,24 +10,18 @@ use Nette\Http\Request;
 
 class VueComponent implements PluginComponent
 {
+	private string $key;
 
-	/** @var string */
-	private $key;
+	private string $name;
 
-	/** @var string */
-	private $name;
+	private string $tab;
 
-	/** @var string */
-	private $tab;
+	private string $source;
 
-	/** @var string */
-	private $source;
+	private int $position;
 
 	/** @var string[] */
-	private $params;
-
-	/** @var int */
-	private $position;
+	private array $params;
 
 
 	/**

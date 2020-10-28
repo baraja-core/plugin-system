@@ -10,21 +10,16 @@ use Tracy\IBarPanel;
 
 final class CmsPluginPanel implements IBarPanel
 {
+	private PluginManager $pluginManager;
 
-	/** @var PluginManager */
-	private $pluginManager;
+	private ?string $plugin;
 
-	/** @var string|null */
-	private $plugin;
+	private ?string $view;
 
-	/** @var string|null */
-	private $view;
-
-	/** @var Plugin|null */
-	private $pluginService;
+	private ?Plugin $pluginService;
 
 	/** @var true[] (componentName => true) */
-	private $renderedComponents = [];
+	private array $renderedComponents = [];
 
 
 	public function __construct(PluginManager $pluginManager)
@@ -61,8 +56,8 @@ final class CmsPluginPanel implements IBarPanel
 
 
 	/**
-	 * @internal
 	 * @param PluginComponent[] $renderedComponents
+	 * @internal
 	 */
 	public function setRenderedComponents(array $renderedComponents): void
 	{

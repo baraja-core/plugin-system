@@ -14,36 +14,29 @@ use Baraja\Plugin\SimpleComponent\ContextMenu;
 
 abstract class BasePlugin implements Plugin
 {
+	private ?string $title;
 
-	/** @var string|null */
-	private $title;
+	private ?string $subtitle;
 
-	/** @var string|null */
-	private $subtitle;
+	private ?string$linkBack;
+
+	private bool $saveAll = false;
+
+	private ?string $smartControlComponentName;
+
+	private Context $context;
 
 	/** @var Button[] */
-	private $buttons = [];
+	private array $buttons = [];
 
 	/** @var Breadcrumb[] */
-	private $breadcrumb = [];
-
-	/** @var string|null */
-	private $linkBack;
-
-	/** @var bool */
-	private $saveAll = false;
+	private array $breadcrumb = [];
 
 	/** @var ContextMenu[] */
-	private $contextMenu = [];
-
-	/** @var string|null */
-	private $smartControlComponentName;
+	private array $contextMenu = [];
 
 	/** @var mixed[] */
-	private $smartControlComponentParams = [];
-
-	/** @var Context */
-	private $context;
+	private array$smartControlComponentParams = [];
 
 
 	final public function run(): void

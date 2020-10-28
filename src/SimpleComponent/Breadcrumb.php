@@ -7,11 +7,9 @@ namespace Baraja\Plugin\SimpleComponent;
 
 final class Breadcrumb implements SimpleComponent
 {
-	/** @var string */
-	private $label;
+	private string $label;
 
-	/** @var string */
-	private $href;
+	private string $href;
 
 
 	public function __construct(string $label, ?string $href = null)

@@ -7,33 +7,24 @@ namespace Baraja\Plugin\Component;
 
 final class ComponentDIDefinition
 {
+	private string $key;
 
-	/** @var string */
-	private $key;
+	private string $name;
 
-	/** @var string */
-	private $name;
+	private string $implements;
 
-	/** @var string */
-	private $implements;
+	private string $componentClass;
 
-	/** @var string */
-	private $componentClass;
+	private string $view;
 
-	/** @var string */
-	private $view;
+	private string $source;
 
-	/** @var string */
-	private $source;
+	private int $position;
 
-	/** @var int */
-	private $position;
-
-	/** @var string */
-	private $tab;
+	private string $tab;
 
 	/** @var string[] */
-	private $params;
+	private array $params;
 
 
 	/**

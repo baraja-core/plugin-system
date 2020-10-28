@@ -7,9 +7,7 @@ namespace Baraja\Plugin\Exception;
 
 final class PluginRedirectException extends \RuntimeException
 {
-
-	/** @var string */
-	private $path;
+	private string $path;
 
 
 	public function __construct(string $path)

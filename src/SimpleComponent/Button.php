@@ -31,20 +31,15 @@ final class Button implements SimpleComponent
 
 	public const ACTION_METHOD = 'method';
 
-	/** @var string */
-	private $variant;
+	private string $variant;
 
-	/** @var string */
-	private $label;
+	private string $label;
 
-	/** @var string|null */
-	private $icon;
+	private ?string $icon;
 
-	/** @var string */
-	private $action;
+	private string $action;
 
-	/** @var string */
-	private $target;
+	private string $target;
 
 
 	public function __construct(string $variant, string $label, string $action, string $target, ?string $icon = null)

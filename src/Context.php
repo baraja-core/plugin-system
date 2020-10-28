@@ -7,9 +7,7 @@ namespace Baraja\Plugin;
 
 final class Context
 {
-
-	/** @var PluginLinkGenerator|null */
-	private $linkGenerator;
+	private ?PluginLinkGenerator $linkGenerator = null;
 
 
 	public function getLinkGenerator(): ?PluginLinkGenerator

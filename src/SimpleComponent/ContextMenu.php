@@ -17,20 +17,15 @@ final class ContextMenu implements SimpleComponent
 
 	public const ACTION_METHOD = 'method';
 
-	/** @var bool */
-	private $active;
+	private bool $active;
 
-	/** @var bool */
-	private $disabled;
+	private bool $disabled;
 
-	/** @var string */
-	private $name;
+	private string $name;
 
-	/** @var string */
-	private $action;
+	private string $action;
 
-	/** @var string|null */
-	private $target;
+	private ?string $target;
 
 
 	public function __construct(string $name, string $action, ?string $target = null, bool $active = false, bool $disabled = false)
