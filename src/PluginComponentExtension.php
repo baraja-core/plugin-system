@@ -22,7 +22,6 @@ class PluginComponentExtension extends CompilerExtension
 	public static function defineBasicServices(ContainerBuilder $builder): void
 	{
 		static $defined = false;
-
 		if ($defined === false) {
 			$defined = true;
 
@@ -47,7 +46,7 @@ class PluginComponentExtension extends CompilerExtension
 		/** @var ServiceDefinition $pluginManager */
 		$pluginManager = $builder->getDefinitionByType(PluginManager::class);
 
-		$builder->addDefinition(self::SERVICE_PREFIX . 'cmsPluginPanel')
+		$builder->addDefinition($this->prefix('cmsPluginPanel'))
 			->setFactory(CmsPluginPanel::class);
 
 		if (PHP_SAPI === 'cli') {
@@ -147,12 +146,11 @@ class PluginComponentExtension extends CompilerExtension
 				throw new \RuntimeException('Service "' . $class . '" is broken: ' . $e->getMessage(), $e->getCode(), $e);
 			}
 			if ($rc->isInstantiable() && $rc->implementsInterface(Plugin::class)) {
-				$plugin = $builder->addDefinition(self::SERVICE_PREFIX . 'plugin.' . str_replace('\\', '.', $class))
+				$plugin = $builder->addDefinition($this->prefix('plugin') . '.' . str_replace('\\', '.', $class))
 					->setFactory($class)
 					->addTag('baraja-plugin');
 
 				$return[] = $plugin->getName();
-
 				if ($rc->hasMethod('setContext') === true) {
 					$plugin->addSetup('?->setContext(?)', ['@self', '@' . Context::class]);
 				} else {
