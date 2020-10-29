@@ -12,11 +12,11 @@ final class CmsPluginPanel implements IBarPanel
 {
 	private PluginManager $pluginManager;
 
-	private ?string $plugin;
+	private ?string $plugin = null;
 
-	private ?string $view;
+	private ?string $view = null;
 
-	private ?Plugin $pluginService;
+	private ?Plugin $pluginService = null;
 
 	/** @var true[] (componentName => true) */
 	private array $renderedComponents = [];
