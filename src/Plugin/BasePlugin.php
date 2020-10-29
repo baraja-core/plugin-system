@@ -14,15 +14,15 @@ use Baraja\Plugin\SimpleComponent\ContextMenu;
 
 abstract class BasePlugin implements Plugin
 {
-	private ?string $title;
+	private ?string $title = null;
 
-	private ?string $subtitle;
+	private ?string $subtitle = null;
 
-	private ?string$linkBack;
+	private ?string $linkBack = null;
 
 	private bool $saveAll = false;
 
-	private ?string $smartControlComponentName;
+	private ?string $smartControlComponentName = null;
 
 	private Context $context;
 
