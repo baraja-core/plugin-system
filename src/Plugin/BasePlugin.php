@@ -133,7 +133,6 @@ abstract class BasePlugin implements Plugin
 	 * Create internal link to specific plugin and view.
 	 *
 	 * @param mixed[] $params
-	 * @return string
 	 */
 	final public function link(string $route = 'Homepage:default', array $params = []): string
 	{

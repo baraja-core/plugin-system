@@ -59,6 +59,9 @@ class VueComponent implements PluginComponent
 			if (($paramValue = $url->getQueryParameter($param)) === null) {
 				throw new \RuntimeException('Component "' . $this->key . '": Parameter "' . $param . '" is undefined.');
 			}
+			if (\is_string($paramValue) === false) {
+				throw new \RuntimeException('Parameter "' . $param . '" must be string or null.');
+			}
 
 			$params[] = $this->escapeHtmlAttr($param) . '="' . $this->escapeHtmlAttr($paramValue) . '"';
 		}

@@ -54,7 +54,6 @@ interface Plugin extends Service
 	public function getMenuItem(): ?array;
 
 	/**
-	 * @param string $path
 	 * @throws PluginRedirectException
 	 */
 	public function redirect(string $path): void;

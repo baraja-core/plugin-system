@@ -19,7 +19,7 @@ final class PluginManager
 	private array $components = [];
 
 	/** @var mixed[]|null */
-	private ?array $pluginInfo;
+	private ?array $pluginInfo = null;
 
 	/** @var string[] */
 	private array $baseEntityToPlugin;
@@ -85,6 +85,9 @@ final class PluginManager
 		$implements[\get_class($plugin)] = true;
 		if (($baseEntity = $plugin->getBaseEntity()) !== null) {
 			$implements[$baseEntity] = true;
+			if (\class_exists($baseEntity) === false) {
+				throw new \InvalidArgumentException('Entity class "' . $baseEntity . '" does not exist or is not autoloadable.');
+			}
 			try {
 				foreach ((new \ReflectionClass($baseEntity))->getInterfaces() as $interface) {
 					$implements[$interface->getName()] = true;
@@ -205,7 +208,6 @@ final class PluginManager
 
 	/**
 	 * @param string[] $pluginServices
-	 * @return string
 	 */
 	private function getPluginServicesHash(array $pluginServices): string
 	{
@@ -257,7 +259,7 @@ final class PluginManager
 				'realName' => $plugin->getName(),
 				'baseEntity' => $baseEntity,
 				'label' => $plugin->getLabel(),
-				'basePath' => \dirname($ref->getFileName()),
+				'basePath' => \dirname((string) $ref->getFileName()),
 				'priority' => $plugin->getPriority(),
 				'icon' => $plugin->getIcon(),
 				'roles' => $roles,

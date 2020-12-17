@@ -53,8 +53,11 @@ class PluginComponentExtension extends CompilerExtension
 			return;
 		}
 
+		/** @var mixed[] $config */
+		$config = $this->getConfig();
+
 		$components = [];
-		foreach ($this->config ?? [] as $key => $component) {
+		foreach ($config as $key => $component) {
 			if (\is_string($key) === false) {
 				throw new \RuntimeException('Component name must be string, but "' . $key . '" given.');
 			}
@@ -150,7 +153,7 @@ class PluginComponentExtension extends CompilerExtension
 					->setFactory($class)
 					->addTag('baraja-plugin');
 
-				$return[] = $plugin->getName();
+				$return[] = (string) $plugin->getName();
 				if ($rc->hasMethod('setContext') === true) {
 					$plugin->addSetup('?->setContext(?)', ['@self', '@' . Context::class]);
 				} else {

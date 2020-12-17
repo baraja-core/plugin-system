@@ -9,7 +9,6 @@ interface PluginLinkGenerator
 {
 	/**
 	 * @param mixed[] $params
-	 * @return string
 	 */
 	public function link(string $route, array $params): string;
 }
