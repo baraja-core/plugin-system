@@ -80,6 +80,13 @@ class VueComponent implements PluginComponent
 	}
 
 
+	public function getName(): string
+	{
+		return $this->name;
+	}
+
+
+
 	public function getKey(): string
 	{
 		return $this->key;

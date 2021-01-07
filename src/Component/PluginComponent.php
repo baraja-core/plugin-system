@@ -23,6 +23,8 @@ interface PluginComponent
 	 */
 	public function getSource(): string;
 
+	public function getName(): string;
+
 	public function getKey(): string;
 
 	/**
