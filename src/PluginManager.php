@@ -7,7 +7,7 @@ namespace Baraja\Plugin;
 
 use Baraja\Plugin\Component\PluginComponent;
 use Nette\Caching\Cache;
-use Nette\Caching\IStorage;
+use Nette\Caching\Storage;
 use Nette\DI\Container;
 use Nette\DI\Extensions\InjectExtension;
 use Nette\Utils\Strings;
@@ -35,7 +35,7 @@ final class PluginManager
 	private Container $container;
 
 
-	public function __construct(Container $container, IStorage $storage)
+	public function __construct(Container $container, Storage $storage)
 	{
 		$this->container = $container;
 		$this->cache = new Cache($storage, 'baraja-plugin-manager');
@@ -76,16 +76,27 @@ final class PluginManager
 
 
 	/**
+	 * @param Plugin|PluginInfoEntity|string $plugin
 	 * @param string|null $view (string => filter by specific view, null => return all components for plugin)
 	 * @return PluginComponent[]
 	 */
-	public function getComponents(Plugin $plugin, ?string $view): array
+	public function getComponents($plugin, ?string $view): array
 	{
+		if (\is_string($plugin)) {
+			$plugin = $this->getPluginByType($plugin);
+		} elseif ($plugin instanceof PluginInfoEntity) {
+			$plugin = $this->getPluginByType($plugin->getType());
+		}
 		$implements = [];
 		$implements[\get_class($plugin)] = true;
 		if (($baseEntity = $plugin->getBaseEntity()) !== null) {
 			$implements[$baseEntity] = true;
-			if (\class_exists($baseEntity) === false) {
+			try {
+				$baseEntityExist = \class_exists($baseEntity);
+			} catch (\Throwable $e) {
+				throw new \RuntimeException('Base entity "' . $baseEntity . '" is broken: ' . $e->getMessage(), $e->getCode(), $e);
+			}
+			if ($baseEntityExist === false) {
 				throw new \InvalidArgumentException('Entity class "' . $baseEntity . '" does not exist or is not autoloadable.');
 			}
 			try {
@@ -203,6 +214,33 @@ final class PluginManager
 	public function getPluginInfo(): array
 	{
 		return $this->pluginInfo ?? [];
+	}
+
+
+	/**
+	 * @return PluginInfoEntity[]
+	 */
+	public function getPluginInfoEntities(): array
+	{
+		$return = [];
+		foreach ($this->getPluginInfo() as $item) {
+			$return[] = new PluginInfoEntity(
+				$item['service'],
+				$item['type'],
+				$item['name'],
+				$item['realName'],
+				$item['baseEntity'],
+				$item['label'],
+				$item['basePath'],
+				$item['priority'],
+				$item['icon'],
+				$item['roles'],
+				$item['privileges'],
+				$item['menuItem']
+			);
+		}
+
+		return $return;
 	}
 
 
