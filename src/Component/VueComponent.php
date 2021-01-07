@@ -86,7 +86,6 @@ class VueComponent implements PluginComponent
 	}
 
 
-
 	public function getKey(): string
 	{
 		return $this->key;
