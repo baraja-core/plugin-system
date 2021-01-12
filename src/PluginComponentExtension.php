@@ -13,6 +13,8 @@ use Nette\DI\ContainerBuilder;
 use Nette\DI\Definitions\ServiceDefinition;
 use Nette\Loaders\RobotLoader;
 use Nette\Utils\Strings;
+use Tracy\Debugger;
+use Tracy\ILogger;
 
 class PluginComponentExtension extends CompilerExtension
 {
@@ -139,9 +141,16 @@ class PluginComponentExtension extends CompilerExtension
 		$robot->refresh();
 
 		$return = [];
-		foreach (array_unique(array_keys($robot->getIndexedClasses())) as $class) {
-			if (!class_exists($class) && !interface_exists($class) && !trait_exists($class)) {
-				throw new \RuntimeException('Class "' . $class . '" was found, but it cannot be loaded by autoloading.' . "\n" . 'More information: https://php.baraja.cz/autoloading-trid');
+		foreach ($robot->getIndexedClasses() as $class => $path) {
+			try {
+				if (!class_exists($class) && !interface_exists($class) && !trait_exists($class)) {
+					trigger_error('Class "' . $class . '" was found, but it cannot be loaded by autoloading.' . "\n" . 'More information: https://php.baraja.cz/autoloading-trid');
+					continue;
+				}
+			} catch (\Throwable $e) {
+				Debugger::log($e, ILogger::WARNING);
+				trigger_error('Class "' . $class . '" is broken: ' . $e->getMessage());
+				continue;
 			}
 			try {
 				$rc = new \ReflectionClass($class);
