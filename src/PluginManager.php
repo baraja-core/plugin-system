@@ -110,7 +110,13 @@ final class PluginManager
 
 		$return = [];
 		foreach ($this->components as $component) {
-			if (isset($implements[$component['implements']]) === true && ($view === null || $component['view'] === $view)) {
+			if (
+				isset($implements[$component['implements']]) === true
+				&& (
+					$view === null
+					|| $component['view'] === $view
+				)
+			) {
 				/** @var PluginComponent $componentService */
 				$componentService = new $component['componentClass']($component);
 
@@ -237,7 +243,7 @@ final class PluginManager
 				$item['icon'],
 				$item['roles'],
 				$item['privileges'],
-				$item['menuItem']
+				$item['menuItem'],
 			);
 		}
 
@@ -284,7 +290,7 @@ final class PluginManager
 						throw new \RuntimeException(
 							'Plugin compile error: Base entity "' . $route . '" already exist.' . "\n\n"
 							. 'How to solve this issue: Plugin "' . $type . '" is not compatible with plugin "' . $baseEntitySimpleToPlugin[$route] . '".' . "\n\n"
-							. 'One of the plugins should be refactored to make routing unambiguous.'
+							. 'One of the plugins should be refactored to make routing unambiguous.',
 						);
 					}
 					$baseEntitySimpleToPlugin[$route] = $type;

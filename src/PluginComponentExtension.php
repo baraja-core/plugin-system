@@ -76,7 +76,10 @@ class PluginComponentExtension extends CompilerExtension
 				throw new \RuntimeException('Component "' . $key . '": Class or interface "' . $implements . '" does not exist.');
 			}
 			if (isset($component['componentClass']) === true) {
-				if (\is_string($componentClass = $component['componentClass']) === false || \class_exists($componentClass) === false) {
+				if (
+					\is_string($componentClass = $component['componentClass']) === false
+					|| \class_exists($componentClass) === false
+				) {
 					throw new \RuntimeException('Component "' . $key . '": Class "' . $componentClass . '" does not exist.');
 				}
 				try {
@@ -87,7 +90,7 @@ class PluginComponentExtension extends CompilerExtension
 						throw new \RuntimeException(
 							'Component "' . $key . '": Component class "' . $componentClass . '" must be instantiable.'
 							. "\n" . 'Did you implement it as class without abstract mode?'
-							. "\n" . 'Hint: To solve this issue mark class as final with public constructor.'
+							. "\n" . 'Hint: To solve this issue mark class as final with public constructor.',
 						);
 					}
 				} catch (\ReflectionException $e) {
@@ -119,7 +122,7 @@ class PluginComponentExtension extends CompilerExtension
 				$source,
 				(int) ($component['position'] ?? 1),
 				(string) ($component['tab'] ?? $key),
-				$params
+				$params,
 			))->toArray();
 		}
 
@@ -166,7 +169,7 @@ class PluginComponentExtension extends CompilerExtension
 				if ($rc->hasMethod('setContext') === true) {
 					$plugin->addSetup('?->setContext(?)', ['@self', '@' . Context::class]);
 				} else {
-					user_error('Possible bug: Plugin "' . $class . '" do not extends "' . BasePlugin::class . '". Please check your dependency tree.');
+					trigger_error('Possible bug: Plugin "' . $class . '" do not extends "' . BasePlugin::class . '". Please check your dependency tree.');
 				}
 			}
 		}

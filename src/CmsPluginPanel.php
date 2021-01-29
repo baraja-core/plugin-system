@@ -79,7 +79,9 @@ final class CmsPluginPanel implements IBarPanel
 	public function getPanel(): string
 	{
 		$plugins = '';
-		$pluginServiceType = $this->pluginService === null ? '' : \get_class($this->pluginService);
+		$pluginServiceType = $this->pluginService === null
+			? ''
+			: \get_class($this->pluginService);
 		foreach ($this->pluginManager->getPluginInfo() as $plugin) {
 			$plugins .= '<tr' . ($pluginServiceType === $plugin['type'] ? ' style="background:#BDE678"' : '') . '>'
 				. '<td style="text-align:center">' . ($pluginServiceType === $plugin['type'] ? '✓' : '') . '</td>'

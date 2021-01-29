@@ -30,8 +30,17 @@ final class ComponentDIDefinition
 	/**
 	 * @param string[] $params
 	 */
-	public function __construct(string $key, string $name, string $implements, string $componentClass, string $view, string $source, int $position = 1, ?string $tab = null, array $params = [])
-	{
+	public function __construct(
+		string $key,
+		string $name,
+		string $implements,
+		string $componentClass,
+		string $view,
+		string $source,
+		int $position = 1,
+		?string $tab = null,
+		array $params = []
+	) {
 		$this->key = $key;
 		$this->name = $name;
 		$this->implements = $implements;

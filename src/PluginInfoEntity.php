@@ -40,8 +40,20 @@ final class PluginInfoEntity
 	 * @param string[] $privileges
 	 * @param mixed[]|null $menuItem
 	 */
-	public function __construct(string $service, string $type, string $name, string $realName, ?string $baseEntity, string $label, string $basePath, int $priority, ?string $icon, array $roles, array $privileges, ?array $menuItem)
-	{
+	public function __construct(
+		string $service,
+		string $type,
+		string $name,
+		string $realName,
+		?string $baseEntity,
+		string $label,
+		string $basePath,
+		int $priority,
+		?string $icon,
+		array $roles,
+		array $privileges,
+		?array $menuItem
+	) {
 		$this->service = $service;
 		$this->type = $type;
 		$this->name = $name;

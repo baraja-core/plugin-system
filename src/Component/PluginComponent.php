@@ -10,7 +10,6 @@ use Nette\Http\Request;
 
 interface PluginComponent
 {
-
 	/**
 	 * @param mixed[] $config
 	 */

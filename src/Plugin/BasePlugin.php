@@ -36,7 +36,7 @@ abstract class BasePlugin implements Plugin
 	private array $contextMenu = [];
 
 	/** @var mixed[] */
-	private array$smartControlComponentParams = [];
+	private array $smartControlComponentParams = [];
 
 
 	final public function run(): void
@@ -68,7 +68,7 @@ abstract class BasePlugin implements Plugin
 
 	public function __toString(): string
 	{
-		return \get_class($this);
+		return static::class;
 	}
 
 

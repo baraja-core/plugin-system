@@ -28,8 +28,13 @@ final class ContextMenu implements SimpleComponent
 	private ?string $target;
 
 
-	public function __construct(string $name, string $action, ?string $target = null, bool $active = false, bool $disabled = false)
-	{
+	public function __construct(
+		string $name,
+		string $action,
+		?string $target = null,
+		bool $active = false,
+		bool $disabled = false
+	) {
 		$this->name = $name;
 		$this->action = $action;
 		$this->target = $target;
