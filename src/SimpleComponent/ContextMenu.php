@@ -7,15 +7,12 @@ namespace Baraja\Plugin\SimpleComponent;
 
 final class ContextMenu implements SimpleComponent
 {
-	public const ACTION_DIVIDER = 'divider';
-
-	public const ACTION_LINK = 'link';
-
-	public const ACTION_LINK_TAB = 'linkTab';
-
-	public const ACTION_MODAL = 'modal';
-
-	public const ACTION_METHOD = 'method';
+	public const
+		ACTION_DIVIDER = 'divider',
+		ACTION_LINK = 'link',
+		ACTION_LINK_TAB = 'linkTab',
+		ACTION_MODAL = 'modal',
+		ACTION_METHOD = 'method';
 
 	private bool $active;
 

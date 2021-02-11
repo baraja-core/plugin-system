@@ -7,29 +7,21 @@ namespace Baraja\Plugin\SimpleComponent;
 
 final class Button implements SimpleComponent
 {
-	public const VARIANT_PRIMARY = 'primary';
+	public const
+		VARIANT_PRIMARY = 'primary',
+		VARIANT_SECONDARY = 'secondary',
+		VARIANT_SUCCESS = 'success',
+		VARIANT_DANGER = 'danger',
+		VARIANT_WARNING = 'warning',
+		VARIANT_INFO = 'info';
 
-	public const VARIANT_SECONDARY = 'secondary';
-
-	public const VARIANT_SUCCESS = 'success';
-
-	public const VARIANT_DANGER = 'danger';
-
-	public const VARIANT_WARNING = 'warning';
-
-	public const VARIANT_INFO = 'info';
-
-	public const ACTION_DIVIDER = 'divider';
-
-	public const ACTION_LINK = 'link';
-
-	public const ACTION_LINK_TARGET = 'linkTarget';
-
-	public const ACTION_LINK_TAB = 'linkTab';
-
-	public const ACTION_MODAL = 'modal';
-
-	public const ACTION_METHOD = 'method';
+	public const
+		ACTION_DIVIDER = 'divider',
+		ACTION_LINK = 'link',
+		ACTION_LINK_TARGET = 'linkTarget',
+		ACTION_LINK_TAB = 'linkTab',
+		ACTION_MODAL = 'modal',
+		ACTION_METHOD = 'method';
 
 	private string $variant;
 

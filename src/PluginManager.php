@@ -76,11 +76,10 @@ final class PluginManager
 
 
 	/**
-	 * @param Plugin|PluginInfoEntity|string $plugin
 	 * @param string|null $view (string => filter by specific view, null => return all components for plugin)
 	 * @return PluginComponent[]
 	 */
-	public function getComponents($plugin, ?string $view): array
+	public function getComponents(Plugin|PluginInfoEntity|string $plugin, ?string $view): array
 	{
 		if (\is_string($plugin)) {
 			$plugin = $this->getPluginByType($plugin);
@@ -104,7 +103,7 @@ final class PluginManager
 				foreach ((new \ReflectionClass($baseEntity))->getInterfaces() as $interface) {
 					$implements[$interface->getName()] = true;
 				}
-			} catch (\ReflectionException $e) {
+			} catch (\ReflectionException) {
 			}
 		}
 
