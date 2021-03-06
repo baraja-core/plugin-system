@@ -7,15 +7,10 @@ namespace Baraja\Plugin\SimpleComponent;
 
 final class Breadcrumb implements SimpleComponent
 {
-	private string $label;
-
-	private string $href;
-
-
-	public function __construct(string $label, ?string $href = null)
-	{
-		$this->label = $label;
-		$this->href = $href ?? '#';
+	public function __construct(
+		private string $label,
+		private ?string $href = null
+	) {
 	}
 
 
@@ -25,8 +20,8 @@ final class Breadcrumb implements SimpleComponent
 	public function toArray(): array
 	{
 		return [
-			'label' => $this->label,
-			'href' => $this->href,
+			'label' => $this->getLabel(),
+			'href' => $this->getHref(),
 		];
 	}
 
@@ -39,6 +34,6 @@ final class Breadcrumb implements SimpleComponent
 
 	public function getHref(): string
 	{
-		return $this->href;
+		return $this->href ?? '#';
 	}
 }

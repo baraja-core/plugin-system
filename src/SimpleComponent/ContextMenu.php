@@ -14,29 +14,14 @@ final class ContextMenu implements SimpleComponent
 		ACTION_MODAL = 'modal',
 		ACTION_METHOD = 'method';
 
-	private bool $active;
-
-	private bool $disabled;
-
-	private string $name;
-
-	private string $action;
-
-	private ?string $target;
-
 
 	public function __construct(
-		string $name,
-		string $action,
-		?string $target = null,
-		bool $active = false,
-		bool $disabled = false
+		private string $name,
+		private string $action,
+		private ?string $target = null,
+		private bool $active = false,
+		private bool $disabled = false
 	) {
-		$this->name = $name;
-		$this->action = $action;
-		$this->target = $target;
-		$this->active = $active;
-		$this->disabled = $disabled;
 	}
 
 

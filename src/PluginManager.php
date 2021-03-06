@@ -32,12 +32,11 @@ final class PluginManager
 
 	private Cache $cache;
 
-	private Container $container;
 
-
-	public function __construct(Container $container, Storage $storage)
-	{
-		$this->container = $container;
+	public function __construct(
+		private Container $container,
+		Storage $storage
+	) {
 		$this->cache = new Cache($storage, 'baraja-plugin-manager');
 	}
 
@@ -127,7 +126,7 @@ final class PluginManager
 			}
 		}
 
-		usort($return, fn(PluginComponent $a, PluginComponent $b): int => $a->getPosition() < $b->getPosition() ? 1 : -1);
+		usort($return, static fn(PluginComponent $a, PluginComponent $b): int => $a->getPosition() < $b->getPosition() ? 1 : -1);
 
 		return $return;
 	}

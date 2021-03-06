@@ -23,24 +23,14 @@ final class Button implements SimpleComponent
 		ACTION_MODAL = 'modal',
 		ACTION_METHOD = 'method';
 
-	private string $variant;
 
-	private string $label;
-
-	private ?string $icon;
-
-	private string $action;
-
-	private string $target;
-
-
-	public function __construct(string $variant, string $label, string $action, string $target, ?string $icon = null)
-	{
-		$this->variant = $variant;
-		$this->label = $label;
-		$this->icon = $icon;
-		$this->action = $action;
-		$this->target = $target;
+	public function __construct(
+		private string $variant,
+		private string $label,
+		private string $action,
+		private string $target,
+		private ?string $icon = null
+	) {
 	}
 
 

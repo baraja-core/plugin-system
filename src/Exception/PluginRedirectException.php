@@ -7,12 +7,9 @@ namespace Baraja\Plugin\Exception;
 
 final class PluginRedirectException extends \RuntimeException
 {
-	private string $path;
-
-
-	public function __construct(string $path)
-	{
-		$this->path = $path;
+	public function __construct(
+		private string $path
+	) {
 		parent::__construct('Redirect to "' . $path . '"', 301);
 	}
 

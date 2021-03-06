@@ -7,24 +7,6 @@ namespace Baraja\Plugin;
 
 final class PluginInfoEntity
 {
-	private string $service;
-
-	private string $type;
-
-	private string $name;
-
-	private string $realName;
-
-	private ?string $baseEntity;
-
-	private string $label;
-
-	private string $basePath;
-
-	private int $priority;
-
-	private ?string $icon;
-
 	/** @var string[] */
 	private array $roles;
 
@@ -41,28 +23,19 @@ final class PluginInfoEntity
 	 * @param mixed[]|null $menuItem
 	 */
 	public function __construct(
-		string $service,
-		string $type,
-		string $name,
-		string $realName,
-		?string $baseEntity,
-		string $label,
-		string $basePath,
-		int $priority,
-		?string $icon,
+		private string $service,
+		private string $type,
+		private string $name,
+		private string $realName,
+		private ?string $baseEntity,
+		private string $label,
+		private string $basePath,
+		private int $priority,
+		private ?string $icon,
 		array $roles,
 		array $privileges,
 		?array $menuItem
 	) {
-		$this->service = $service;
-		$this->type = $type;
-		$this->name = $name;
-		$this->realName = $realName;
-		$this->baseEntity = $baseEntity;
-		$this->label = $label;
-		$this->basePath = $basePath;
-		$this->priority = $priority;
-		$this->icon = $icon;
 		$this->roles = $roles;
 		$this->privileges = $privileges;
 		$this->menuItem = $menuItem;
