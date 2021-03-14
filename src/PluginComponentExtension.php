@@ -108,10 +108,35 @@ class PluginComponentExtension extends CompilerExtension
 			}
 			$params = [];
 			foreach ($component['params'] ?? [] as $parameter) {
-				if (is_string($parameter) === false) {
-					throw new \RuntimeException('Component "' . $key . '": Parameter "' . $parameter . '" must be string, but "' . \gettype($view) . '" given.');
+				if (is_array($parameter) && count($parameter) === 1) {
+					$parameterName = array_keys($parameter)[0] ?? throw new \RuntimeException('Broken parameter.');
+					$parameterValue = array_values($parameter)[0] ?? null;
+					if (str_starts_with($parameterName, '?')) {
+						$parameterName = str_replace('?', '', $parameterName);
+						if ($parameterValue !== null) { // case '?id = null'
+							throw new \RuntimeException(
+								'Component "' . $key . '": Parameter default type mishmash: '
+								. 'Parameter "' . $parameterName . '" can not implement default value '
+								. '"' . get_debug_type($parameterValue) . '" and be both nullable.',
+							);
+						}
+					}
+				} elseif (is_string($parameter)) {
+					if (str_starts_with($parameter, '?')) {
+						$parameterName = str_replace('?', '', $parameter);
+						$parameterValue = null;
+					} else {
+						$parameterName = $parameter;
+						$parameterValue = '#REQUIRED#';
+					}
+				} else {
+					throw new \RuntimeException(
+						'Component "' . $key . '": Parameter "'
+						. (is_scalar($parameter) ? $parameter : get_debug_type($parameter))
+						. '" must be a string, but "' . \get_debug_type($view) . '" given.',
+					);
 				}
-				$params[] = Strings::firstLower($parameter);
+				$params[Strings::firstLower((string) $parameterName)] = $parameterValue;
 			}
 			$components[] = (new ComponentDIDefinition(
 				$key,
