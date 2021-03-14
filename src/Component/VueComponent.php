@@ -37,6 +37,10 @@ class VueComponent implements PluginComponent
 
 		$parameters = [];
 		foreach ($config['params'] ?? [] as $parameterName => $parameterValue) {
+			if (\is_int($parameterName) && is_string($parameterValue)) {
+				$parameterName = $parameterValue;
+				$parameterValue = null;
+			}
 			if (\is_string($parameterName) === false) {
 				throw new \InvalidArgumentException(
 					'Component "' . $this->key . '": Parameter "' . $parameterName . '" must be '
