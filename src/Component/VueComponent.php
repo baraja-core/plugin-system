@@ -20,7 +20,7 @@ class VueComponent implements PluginComponent
 
 	private int $position;
 
-	/** @var string[] */
+	/** @var array<string, string|int|float|bool|null> */
 	private array $params;
 
 
@@ -36,14 +36,20 @@ class VueComponent implements PluginComponent
 		$this->position = (int) ($config['position'] ?? 50);
 
 		$parameters = [];
-		foreach ($config['params'] ?? [] as $parameter) {
-			if (\is_string($parameter) === false) {
-				throw new \RuntimeException('Component "' . $this->key . '": Parameter "' . $parameter . '" must be string, but "' . \gettype($parameter) . '" given.');
+		foreach ($config['params'] ?? [] as $parameterName => $parameterValue) {
+			if (\is_string($parameterName) === false) {
+				throw new \InvalidArgumentException(
+					'Component "' . $this->key . '": Parameter "' . $parameterName . '" must be '
+					. 'a string, but "' . get_debug_type($parameterName) . '" given.',
+				);
 			}
-			if (\in_array($parameter, $parameters, true) === true) {
-				throw new \RuntimeException('Component "' . $this->key . '": Parameter "' . $parameter . '" already was defined.');
+			if ($parameterValue !== null && is_scalar($parameterValue) === false) {
+				throw new \InvalidArgumentException(
+					'Component "' . $this->key . '": Parameter "' . $parameterName . '" value '
+					. 'must be scalar, but type "' . get_debug_type($parameterValue) . '" given.',
+				);
 			}
-			$parameters[] = $parameter;
+			$parameters[$parameterName] = $parameterValue;
 		}
 		$this->params = $parameters;
 	}
@@ -55,15 +61,20 @@ class VueComponent implements PluginComponent
 		$component = htmlspecialchars($this->name, ENT_QUOTES);
 		$url = $request->getUrl();
 
-		foreach ($this->params as $param) {
-			if (($paramValue = $url->getQueryParameter($param)) === null) {
-				throw new \RuntimeException('Component "' . $this->key . '": Parameter "' . $param . '" is undefined.');
-			}
-			if (\is_string($paramValue) === false) {
-				throw new \RuntimeException('Parameter "' . $param . '" must be string or null.');
+		foreach ($this->params as $paramName => $paramDefaultValue) {
+			$paramValue = $url->getQueryParameter($paramName);
+			if ($paramValue === null) {
+				if ($paramDefaultValue === '#REQUIRED#') {
+					throw new \InvalidArgumentException(
+						'Component "' . $this->key . '": Parameter "' . $paramName . '" is required.',
+					);
+				}
+				$paramValue = $paramDefaultValue;
 			}
 
-			$params[] = $this->escapeHtmlAttr($param) . '="' . $this->escapeHtmlAttr($paramValue) . '"';
+			$params[] = $this->renderHtmlVueAttrType($paramValue)
+				. $this->escapeHtmlAttr($paramName)
+				. '="' . $this->escapeHtmlAttr($paramValue) . '"';
 		}
 
 		return '<' . $component . ($params !== [] ? ' ' . implode(' ', $params) : '') . '>'
@@ -107,12 +118,27 @@ class VueComponent implements PluginComponent
 	/**
 	 * Escapes string for use inside HTML attribute value.
 	 */
-	protected function escapeHtmlAttr(string $s, bool $double = true): string
+	private function escapeHtmlAttr(mixed $s, bool $double = true): string
 	{
+		if (is_bool($s)) {
+			$s = $s ? 'true' : 'false';
+		} elseif ($s === null) {
+			$s = 'null';
+		} elseif (is_scalar($s)) {
+			$s = (string) $s;
+		} else {
+			throw new \InvalidArgumentException('Type "' . get_debug_type($s) . '" is not supported now.');
+		}
 		if (str_contains($s, '`') === true && strpbrk($s, ' <>"\'') === false) {
 			$s .= ' '; // protection against innerHTML mXSS vulnerability nette/nette#1496
 		}
 
 		return htmlspecialchars($s, ENT_QUOTES, 'UTF-8', $double);
+	}
+
+
+	private function renderHtmlVueAttrType(mixed $value): string
+	{
+		return $value === null || is_int($value) || is_float($value) || is_bool($value) ? ':' : '';
 	}
 }
