@@ -188,6 +188,8 @@ class PluginComponentExtension extends CompilerExtension
 			if ($rc->isInstantiable() && $rc->implementsInterface(Plugin::class)) {
 				$plugin = $builder->addDefinition($this->prefix('plugin') . '.' . str_replace('\\', '.', $class))
 					->setFactory($class)
+					->setType($class)
+					->setAutowired($class)
 					->addTag('baraja-plugin');
 
 				$return[] = (string) $plugin->getName();
