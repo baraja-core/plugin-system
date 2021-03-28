@@ -83,7 +83,7 @@ final class CmsPluginPanel implements IBarPanel
 		foreach ($this->pluginManager->getPluginInfo() as $plugin) {
 			$plugins .= '<tr' . ($pluginServiceType === $plugin['type'] ? ' style="background:#BDE678"' : '') . '>'
 				. '<td style="text-align:center">' . ($pluginServiceType === $plugin['type'] ? '✓' : '') . '</td>'
-				. '<td><span title="' . $plugin['basePath'] . '">' . htmlspecialchars($plugin['name']) . '</span></td>'
+				. '<td><span title="' . htmlspecialchars($plugin['basePath']) . '">' . htmlspecialchars($plugin['name']) . '</span></td>'
 				. '<td>' . htmlspecialchars($plugin['realName']) . '</td>'
 				. '<td>' . htmlspecialchars($plugin['label']) . '</td>'
 				. '<td>' . htmlspecialchars($plugin['type']) . '</td>'
@@ -122,7 +122,30 @@ final class CmsPluginPanel implements IBarPanel
 					: '<td>' . htmlspecialchars($component['view']) . '</td>'
 				)
 				. '<td>' . htmlspecialchars((string) ($component['position'] ?? '???'), ENT_QUOTES) . '</td>'
-				. '<td>' . htmlspecialchars(implode(', ', $component['params'] ?? [])) . '</td>'
+				. '<td>' .
+				(function (array $params): string {
+					$return = '';
+					foreach ($params as $parameterName => $parameterValue) {
+						if (\is_int($parameterName) && is_string($parameterValue)) {
+							$parameterName = $parameterValue;
+							$parameterValue = null;
+						}
+						if (($required = $parameterValue === '#REQUIRED#') || $parameterValue !== null) {
+							$item = '<span style="color:#555;border:1px dashed #aaa" title="'
+								. ($required ? 'required' : 'default value: ' . $this->escapeHtmlAttr($parameterValue))
+								. '">'
+								. htmlspecialchars($parameterName)
+								. '</span>';
+						} else {
+							$item = htmlspecialchars($parameterName);
+						}
+
+						$return .= ($return ? ', ' : '') . $item;
+					}
+
+					return $return;
+				})($component['params'] ?? [])
+				. '</td>'
 				. '</tr>';
 		}
 
@@ -140,5 +163,15 @@ final class CmsPluginPanel implements IBarPanel
 			. $components
 			. '</table>'
 			. '</div></div>';
+	}
+
+
+	private function escapeHtmlAttr(string $s): string
+	{
+		if (str_contains($s, '`') && strpbrk($s, ' <>"\'') === false) {
+			$s .= ' '; // protection against innerHTML mXSS vulnerability nette/nette#1496
+		}
+
+		return htmlspecialchars($s, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, 'UTF-8', true);
 	}
 }
