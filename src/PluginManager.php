@@ -98,7 +98,6 @@ final class PluginManager
 				throw new \InvalidArgumentException('Entity class "' . $baseEntity . '" does not exist or is not autoloadable.');
 			}
 			try {
-				/** @phpstan-ignore-next-line */
 				foreach ((new \ReflectionClass($baseEntity))->getInterfaces() as $interface) {
 					$implements[$interface->getName()] = true;
 				}
