@@ -80,17 +80,18 @@ final class PluginManager
 	 */
 	public function getComponents(Plugin|PluginInfoEntity|string $plugin, ?string $view): array
 	{
-		if (\is_string($plugin)) {
+		if (is_string($plugin)) {
 			$plugin = $this->getPluginByType($plugin);
 		} elseif ($plugin instanceof PluginInfoEntity) {
 			$plugin = $this->getPluginByType($plugin->getType());
 		}
 		$implements = [];
-		$implements[\get_class($plugin)] = true;
-		if (($baseEntity = $plugin->getBaseEntity()) !== null) {
+		$implements[$plugin::class] = true;
+		$baseEntity = $plugin->getBaseEntity();
+		if ($baseEntity !== null) {
 			$implements[$baseEntity] = true;
 			try {
-				$baseEntityExist = \class_exists($baseEntity);
+				$baseEntityExist = class_exists($baseEntity);
 			} catch (\Throwable $e) {
 				throw new \RuntimeException('Base entity "' . $baseEntity . '" is broken: ' . $e->getMessage(), $e->getCode(), $e);
 			}
@@ -190,7 +191,7 @@ final class PluginManager
 
 	public function getPluginNameByType(Plugin $type): string
 	{
-		$typeClass = \get_class($type);
+		$typeClass = $type::class;
 		foreach ($this->pluginNameToType as $pluginName => $pluginType) {
 			if ($pluginType === $typeClass) {
 				return $pluginName;
@@ -208,7 +209,7 @@ final class PluginManager
 			return $service;
 		}
 
-		throw new \RuntimeException('Plugin must be instance of "' . Plugin::class . '", but "' . \get_class($service) . '" given.');
+		throw new \RuntimeException('Plugin must be instance of "' . Plugin::class . '", but "' . $service::class . '" given.');
 	}
 
 
@@ -270,7 +271,7 @@ final class PluginManager
 		foreach ($pluginServices as $pluginService) {
 			/** @var Plugin $plugin */
 			$plugin = $this->container->getService($pluginService);
-			$type = \get_class($plugin);
+			$type = $plugin::class;
 			try {
 				$ref = new \ReflectionClass($plugin);
 			} catch (\ReflectionException $e) {
@@ -283,10 +284,12 @@ final class PluginManager
 			if (($baseEntity = $plugin->getBaseEntity()) !== null) {
 				$baseEntityToPlugin[$baseEntity] = $type;
 				if (preg_match('/\\\\([^\\\\]+)$/', $baseEntity, $baseEntityParser)) {
-					if (isset($baseEntitySimpleToPlugin[$route = $baseEntityParser[1]]) === true) {
+					$route = $baseEntityParser[1];
+					if (isset($baseEntitySimpleToPlugin[$route]) === true) {
 						throw new \RuntimeException(
 							'Plugin compile error: Base entity "' . $route . '" already exist.' . "\n\n"
-							. 'How to solve this issue: Plugin "' . $type . '" is not compatible with plugin "' . $baseEntitySimpleToPlugin[$route] . '".' . "\n\n"
+							. 'How to solve this issue: Plugin "' . $type . '" is not compatible with plugin "'
+							. $baseEntitySimpleToPlugin[$route] . '".' . "\n\n"
 							. 'One of the plugins should be refactored to make routing unambiguous.',
 						);
 					}
@@ -324,7 +327,7 @@ final class PluginManager
 	private function validateRoles(array $roles): void
 	{
 		foreach ($roles as $role) {
-			if (\is_string($role) === false) {
+			if (is_string($role) === false) {
 				throw new \RuntimeException('Role must be a string, but type "' . \gettype($role) . '" given.');
 			}
 		}
@@ -337,7 +340,7 @@ final class PluginManager
 	private function validatePrivileges(array $privileges): void
 	{
 		foreach ($privileges as $privilege) {
-			if (\is_string($privilege) === false) {
+			if (is_string($privilege) === false) {
 				throw new \RuntimeException('Privilege must be a string, but type "' . \gettype($privilege) . '" given.');
 			}
 			if ($privilege === '') {
