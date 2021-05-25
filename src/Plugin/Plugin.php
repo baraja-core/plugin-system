@@ -54,6 +54,7 @@ interface Plugin extends Service
 	public function getMenuItem(): ?array;
 
 	/**
+	 * @phpstan-return never-return
 	 * @throws PluginRedirectException
 	 */
 	public function redirect(string $path): void;

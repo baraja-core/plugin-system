@@ -111,18 +111,27 @@ abstract class BasePlugin implements Plugin
 	}
 
 
+	/**
+	 * @phpstan-return never-return
+	 */
 	public function redirect(string $path): void
 	{
 		throw new PluginRedirectException($path);
 	}
 
 
+	/**
+	 * @phpstan-return never-return
+	 */
 	public function error(?string $message = null): void
 	{
 		throw new PluginUserErrorException($message ?? $this->getName() . ': Plugin error');
 	}
 
 
+	/**
+	 * @phpstan-return never-return
+	 */
 	public function terminate(): void
 	{
 		throw new PluginTerminateException('');
@@ -136,8 +145,12 @@ abstract class BasePlugin implements Plugin
 	 */
 	final public function link(string $route = 'Homepage:default', array $params = []): string
 	{
-		if (($linkGenerator = $this->context->getLinkGenerator()) === null) {
-			throw new \RuntimeException('Link generator failed: Service for "' . PluginLinkGenerator::class . '" does not registered. Did you install baraja-core/cms?');
+		$linkGenerator = $this->context->getLinkGenerator();
+		if ($linkGenerator === null) {
+			throw new \RuntimeException(
+				'Link generator failed: Service for "' . PluginLinkGenerator::class . '"'
+				. ' does not registered. Did you install baraja-core/cms?',
+			);
 		}
 
 		return $linkGenerator->link($route, $params);
