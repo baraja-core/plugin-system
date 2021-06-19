@@ -143,6 +143,10 @@ class VueComponent implements PluginComponent
 
 	private function renderHtmlVueAttrType(mixed $value): string
 	{
-		return $value === null || is_int($value) || is_float($value) || is_bool($value) ? ':' : '';
+		return $value === null
+			|| is_int($value)
+			|| is_numeric($value)
+			|| is_float($value)
+			|| is_bool($value) ? ':' : '';
 	}
 }
