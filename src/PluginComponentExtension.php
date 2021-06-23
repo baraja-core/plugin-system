@@ -212,7 +212,11 @@ class PluginComponentExtension extends CompilerExtension
 				}
 			} catch (\Throwable $e) {
 				Debugger::log($e, ILogger::WARNING);
-				trigger_error('Class "' . $class . '" is broken: ' . $e->getMessage());
+				try {
+					trigger_error('Class "' . $class . '" is broken: ' . $e->getMessage());
+				} catch (\Throwable) {
+					// Silence is golden.
+				}
 				continue;
 			}
 			try {
