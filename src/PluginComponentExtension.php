@@ -211,6 +211,9 @@ class PluginComponentExtension extends CompilerExtension
 					continue;
 				}
 			} catch (\Throwable $e) {
+				if (preg_match('/^Interface "Composer\\\[^"]+" not found$/u', $e->getMessage())) {
+					continue;
+				}
 				Debugger::log($e, ILogger::WARNING);
 				try {
 					trigger_error('Class "' . $class . '" is broken: ' . $e->getMessage());
