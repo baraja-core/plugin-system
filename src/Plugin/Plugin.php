@@ -36,6 +36,9 @@ interface Plugin extends Service
 
 	public function getPriority(): int;
 
+	/**
+	 * Source: https://bootstrap-vue.org/docs/icons#icons
+	 */
 	public function getIcon(): ?string;
 
 	/**
