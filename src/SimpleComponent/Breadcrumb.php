@@ -15,7 +15,7 @@ final class Breadcrumb implements SimpleComponent
 
 
 	/**
-	 * @return string[]
+	 * @return array{label: string, href: string}
 	 */
 	public function toArray(): array
 	{

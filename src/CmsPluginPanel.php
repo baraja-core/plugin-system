@@ -16,7 +16,7 @@ final class CmsPluginPanel implements IBarPanel
 
 	private ?Plugin $pluginService = null;
 
-	/** @var true[] (componentName => true) */
+	/** @var array<string, true> (componentName => true) */
 	private array $renderedComponents = [];
 
 
@@ -70,7 +70,12 @@ final class CmsPluginPanel implements IBarPanel
 
 	public function getTab(): string
 	{
-		return 'CMS' . ($this->plugin !== null && $this->view !== null ? '&nbsp;' . htmlspecialchars($this->plugin) . ':' . htmlspecialchars($this->view) : '');
+		$label = '';
+		if ($this->plugin !== null && $this->view !== null) {
+			$label = htmlspecialchars($this->plugin) . ':' . htmlspecialchars($this->view);
+		}
+
+		return 'CMS' . ($label !== '' ? '&nbsp;' . $label : '');
 	}
 
 
@@ -130,9 +135,10 @@ final class CmsPluginPanel implements IBarPanel
 							$parameterName = $parameterValue;
 							$parameterValue = null;
 						}
-						if (($required = $parameterValue === '#REQUIRED#') || $parameterValue !== null) {
+						$isRequired = $parameterValue === '#REQUIRED#';
+						if ($isRequired || $parameterValue !== null) {
 							$item = '<span style="color:#555;border:1px dashed #aaa" title="'
-								. ($required ? 'required' : 'default value: ' . $this->escapeHtmlAttr($parameterValue))
+								. ($isRequired ? 'required' : 'default value: ' . $this->escapeHtmlAttr($parameterValue))
 								. '">'
 								. htmlspecialchars($parameterName)
 								. '</span>';

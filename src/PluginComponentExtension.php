@@ -189,12 +189,13 @@ class PluginComponentExtension extends CompilerExtension
 
 
 	/**
-	 * @return string[]
+	 * @return array<int, string>
 	 */
 	private function createPluginServices(ContainerBuilder $builder): array
 	{
+		$rootDir = dirname(__DIR__, 4);
 		$robot = new RobotLoader;
-		$robot->addDirectory($rootDir = dirname(__DIR__, 4));
+		$robot->addDirectory($rootDir);
 		$robot->setTempDirectory($rootDir . '/temp/cache/baraja.pluginSystem');
 		$robot->acceptFiles = ['*Plugin.php'];
 		$robot->reportParseErrors(false);
@@ -222,15 +223,7 @@ class PluginComponentExtension extends CompilerExtension
 				}
 				continue;
 			}
-			try {
-				$rc = new \ReflectionClass($class);
-			} catch (\ReflectionException $e) {
-				throw new \RuntimeException(
-					'Service "' . $class . '" is broken: ' . $e->getMessage(),
-					$e->getCode(),
-					$e,
-				);
-			}
+			$rc = new \ReflectionClass($class);
 			if ($rc->isInstantiable() && $rc->implementsInterface(Plugin::class)) {
 				$plugin = $builder->addDefinition($this->prefix('plugin') . '.' . str_replace('\\', '.', $class))
 					->setFactory($class)

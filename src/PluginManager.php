@@ -14,11 +14,10 @@ use Nette\Utils\Strings;
 
 final class PluginManager
 {
-
-	/** @var mixed[] */
+	/** @var array<int, mixed> */
 	private array $components = [];
 
-	/** @var mixed[]|null */
+	/** @var array<int, mixed>|null */
 	private ?array $pluginInfo = null;
 
 	/** @var string[] */
@@ -27,7 +26,7 @@ final class PluginManager
 	/** @var string[] */
 	private array $baseEntitySimpleToPlugin;
 
-	/** @var string[] (name => type) */
+	/** @var array<string, class-string> (name => type) */
 	private array $pluginNameToType;
 
 	private Cache $cache;
@@ -51,19 +50,19 @@ final class PluginManager
 	{
 		$cache = $this->cache->load('plugin-info');
 		if ($cache === null || ((string) ($cache['hash'] ?? '')) !== $this->getPluginServicesHash($pluginServices)) {
-			$info = $this->processPluginInfo($pluginServices);
-			$nameToType = [];
+			[$plugins, $baseEntityToPlugin, $baseEntitySimpleToPlugin] = $this->processPluginInfo($pluginServices);
 
-			foreach ($info['plugins'] as $plugin) {
-				$nameToType[$plugin['name']] = $plugin['type'];
+			$pluginNameToType = [];
+			foreach ($plugins as $plugin) {
+				$pluginNameToType[$plugin['name']] = $plugin['type'];
 			}
 
 			$this->cache->save('plugin-info', $cache = [
 				'hash' => $this->getPluginServicesHash($pluginServices),
-				'plugins' => $info['plugins'],
-				'baseEntityToPlugin' => $info['baseEntityToPlugin'],
-				'baseEntitySimpleToPlugin' => $info['baseEntitySimpleToPlugin'],
-				'nameToType' => $nameToType,
+				'plugins' => $plugins,
+				'baseEntityToPlugin' => $baseEntityToPlugin,
+				'baseEntitySimpleToPlugin' => $baseEntitySimpleToPlugin,
+				'nameToType' => $pluginNameToType,
 			]);
 		}
 
@@ -81,13 +80,16 @@ final class PluginManager
 	public function getComponents(Plugin|PluginInfoEntity|string $plugin, ?string $view): array
 	{
 		if (is_string($plugin)) {
-			$plugin = $this->getPluginByType($plugin);
+			assert(class_exists($plugin));
+			$pluginService = $this->getPluginByType($plugin);
 		} elseif ($plugin instanceof PluginInfoEntity) {
-			$plugin = $this->getPluginByType($plugin->getType());
+			$pluginService = $this->getPluginByType($plugin->getType());
+		} else {
+			$pluginService = $plugin;
 		}
 		$implements = [];
-		$implements[$plugin::class] = true;
-		$baseEntity = $plugin->getBaseEntity();
+		$implements[$pluginService::class] = true;
+		$baseEntity = $pluginService->getBaseEntity();
 		if ($baseEntity !== null) {
 			$implements[$baseEntity] = true;
 			try {
@@ -119,7 +121,9 @@ final class PluginManager
 				$componentService = new $component['componentClass']($component);
 
 				foreach (InjectExtension::getInjectProperties($component['componentClass']) as $property => $service) {
-					$componentService->{$property} = $this->container->getByType($service);
+					/** @var object $dependency @phpstan-ignore-next-line */
+					$dependency = $this->container->getByType($service);
+					$componentService->{$property} = $dependency;
 				}
 
 				$return[] = $componentService;
@@ -202,14 +206,23 @@ final class PluginManager
 	}
 
 
+	/**
+	 * @param class-string $type
+	 */
 	public function getPluginByType(string $type): Plugin
 	{
-		$service = $this->container->getByType($type);
-		if ($service instanceof Plugin) {
-			return $service;
+		if (is_subclass_of($type, Plugin::class) === false) {
+			throw new \RuntimeException(sprintf(
+				'Plugin must be instance of "%s", but "%s" given.',
+				Plugin::class,
+				$type,
+			));
 		}
 
-		throw new \RuntimeException('Plugin must be instance of "' . Plugin::class . '", but "' . $service::class . '" given.');
+		/** @var Plugin $service */
+		$service = $this->container->getByType($type);
+
+		return $service;
 	}
 
 
@@ -223,25 +236,25 @@ final class PluginManager
 
 
 	/**
-	 * @return PluginInfoEntity[]
+	 * @return array<int, PluginInfoEntity>
 	 */
 	public function getPluginInfoEntities(): array
 	{
 		$return = [];
 		foreach ($this->getPluginInfo() as $item) {
 			$return[] = new PluginInfoEntity(
-				$item['service'],
-				$item['type'],
-				$item['name'],
-				$item['realName'],
-				$item['baseEntity'],
-				$item['label'],
-				$item['basePath'],
-				$item['priority'],
-				$item['icon'],
-				$item['roles'],
-				$item['privileges'],
-				$item['menuItem'],
+				service: $item['service'],
+				type: $item['type'],
+				name: $item['name'],
+				realName: $item['realName'],
+				baseEntity: $item['baseEntity'],
+				label: $item['label'],
+				basePath: $item['basePath'],
+				priority: $item['priority'],
+				icon: $item['icon'],
+				roles: $item['roles'],
+				privileges: $item['privileges'],
+				menuItem: $item['menuItem'],
 			);
 		}
 
@@ -250,7 +263,7 @@ final class PluginManager
 
 
 	/**
-	 * @param string[] $pluginServices
+	 * @param array<int, string> $pluginServices
 	 */
 	private function getPluginServicesHash(array $pluginServices): string
 	{
@@ -259,8 +272,8 @@ final class PluginManager
 
 
 	/**
-	 * @param string[] $pluginServices
-	 * @return mixed[]
+	 * @param array<int, string> $pluginServices
+	 * @return array{0: array<class-string<Plugin>, array{service: string, type: class-string<Plugin>, name: string, realName: string, baseEntity: string|null, label: string, basePath: string, priority: int, icon: string|null, roles: array<int, string>, privileges: array<int, string>, menuItem: array<string, string|null>|null}>, 1: array<class-string, class-string<Plugin>>, 2: array<string, class-string<Plugin>>}
 	 */
 	private function processPluginInfo(array $pluginServices): array
 	{
@@ -272,19 +285,17 @@ final class PluginManager
 			/** @var Plugin $plugin */
 			$plugin = $this->container->getService($pluginService);
 			$type = $plugin::class;
-			try {
-				$ref = new \ReflectionClass($plugin);
-			} catch (\ReflectionException $e) {
-				throw new \RuntimeException($e->getMessage(), $e->getCode(), $e);
-			}
+			$ref = new \ReflectionClass($plugin);
+			$roles = $plugin->getRoles();
+			$privileges = $plugin->getPrivileges();
+			$this->validateRoles($roles);
+			$this->validatePrivileges($privileges);
 
-			$this->validateRoles($roles = $plugin->getRoles());
-			$this->validatePrivileges($privileges = $plugin->getPrivileges());
-
-			if (($baseEntity = $plugin->getBaseEntity()) !== null) {
+			$baseEntity = $plugin->getBaseEntity();
+			if ($baseEntity !== null) {
 				$baseEntityToPlugin[$baseEntity] = $type;
 				if (preg_match('/\\\\([^\\\\]+)$/', $baseEntity, $baseEntityParser)) {
-					$route = $baseEntityParser[1];
+					$route = (string) $baseEntityParser[1];
 					if (isset($baseEntitySimpleToPlugin[$route]) === true) {
 						throw new \RuntimeException(
 							'Plugin compile error: Base entity "' . $route . '" already exist.' . "\n\n"
@@ -314,9 +325,9 @@ final class PluginManager
 		}
 
 		return [
-			'plugins' => $plugins,
-			'baseEntityToPlugin' => $baseEntityToPlugin,
-			'baseEntitySimpleToPlugin' => $baseEntitySimpleToPlugin,
+			$plugins,
+			$baseEntityToPlugin,
+			$baseEntitySimpleToPlugin,
 		];
 	}
 

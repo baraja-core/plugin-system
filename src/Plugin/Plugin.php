@@ -22,6 +22,8 @@ interface Plugin extends Service
 
 	/**
 	 * Base related entity for this plugin (for ex. Article, Product, ...).
+	 *
+	 * @return class-string|null
 	 */
 	public function getBaseEntity(): ?string;
 
@@ -42,17 +44,17 @@ interface Plugin extends Service
 	public function getIcon(): ?string;
 
 	/**
-	 * @return string[]
+	 * @return array<int, string>
 	 */
 	public function getRoles(): array;
 
 	/**
-	 * @return string[]
+	 * @return array<int, string>
 	 */
 	public function getPrivileges(): array;
 
 	/**
-	 * @return mixed[]|null
+	 * @return array<string, string|null>|null
 	 */
 	public function getMenuItem(): ?array;
 

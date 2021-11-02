@@ -18,10 +18,8 @@ final class Context
 
 	public function setLinkGenerator(PluginLinkGenerator $linkGenerator): void
 	{
-		if ($this->linkGenerator !== null) {
-			throw new \LogicException(
-				'Plugin generator "' . $this->linkGenerator::class . '" has been defined.',
-			);
+		if ($this->linkGenerator !== null && $this->linkGenerator !== $linkGenerator) {
+			throw new \LogicException(sprintf('Plugin generator "%s" has been defined.', $this->linkGenerator::class));
 		}
 		$this->linkGenerator = $linkGenerator;
 	}

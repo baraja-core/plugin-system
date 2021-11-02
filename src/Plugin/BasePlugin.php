@@ -103,7 +103,7 @@ abstract class BasePlugin implements Plugin
 
 
 	/**
-	 * @return string[]
+	 * @return array<string, string|null>|null
 	 */
 	public function getMenuItem(): ?array
 	{

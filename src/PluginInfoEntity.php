@@ -18,6 +18,7 @@ final class PluginInfoEntity
 
 
 	/**
+	 * @param class-string $type
 	 * @param string[] $roles
 	 * @param string[] $privileges
 	 * @param mixed[]|null $menuItem
@@ -48,6 +49,9 @@ final class PluginInfoEntity
 	}
 
 
+	/**
+	 * @return class-string
+	 */
 	public function getType(): string
 	{
 		return $this->type;
