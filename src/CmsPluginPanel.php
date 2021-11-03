@@ -98,11 +98,11 @@ final class CmsPluginPanel implements IBarPanel
 		$components = '';
 		$componentList = $this->pluginManager->getComponentsInfo();
 		usort($componentList, static function (array $a, array $b): int {
-			if (($a['position'] ?? 50) === ($b['position'] ?? 50)) {
+			if ($a['position'] === $b['position']) {
 				return $a['implements'] === $b['implements'] ? 1 : -1;
 			}
 
-			return ($a['position'] ?? 50) < ($b['position'] ?? 50) ? 1 : -1;
+			return $a['position'] < $b['position'] ? 1 : -1;
 		});
 		foreach ($componentList as $component) {
 			$matchPlugin = $pluginServiceType === $component['implements'];
@@ -126,7 +126,7 @@ final class CmsPluginPanel implements IBarPanel
 					? '<td style="background:#BDE678">' . htmlspecialchars($component['view']) . '</td>'
 					: '<td>' . htmlspecialchars($component['view']) . '</td>'
 				)
-				. '<td>' . htmlspecialchars((string) ($component['position'] ?? '???'), ENT_QUOTES) . '</td>'
+				. '<td>' . htmlspecialchars((string) $component['position'], ENT_QUOTES) . '</td>'
 				. '<td>' .
 				(function (array $params): string {
 					$return = '';
@@ -150,7 +150,7 @@ final class CmsPluginPanel implements IBarPanel
 					}
 
 					return $return;
-				})($component['params'] ?? [])
+				})($component['params'])
 				. '</td>'
 				. '</tr>';
 		}

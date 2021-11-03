@@ -14,13 +14,13 @@ use Nette\Utils\Strings;
 
 final class PluginManager
 {
-	/** @var array<int, mixed> */
+	/** @var array<int, array{key: string, name: string, implements: class-string, componentClass: class-string, view: string, source: string, position: int, tab: string, params: array<int|string, string|int|float|bool|null>}> */
 	private array $components = [];
 
-	/** @var array<int, mixed>|null */
+	/** @var array<class-string<Plugin>, array{service: string, type: class-string<Plugin>, name: string, realName: string, baseEntity: string|null, label: string, basePath: string, priority: int, icon: string|null, roles: array<int, string>, privileges: array<int, string>, menuItem: array<string, string|null>|null}>|null */
 	private ?array $pluginInfo = null;
 
-	/** @var string[] */
+	/** @var array<string, string> */
 	private array $baseEntityToPlugin;
 
 	/** @var string[] */
@@ -43,13 +43,14 @@ final class PluginManager
 	/**
 	 * Effective all Plugin services setter.
 	 *
-	 * @param string[] $pluginServices
+	 * @param array<int, string> $pluginServices
 	 * @internal use in DIC
 	 */
 	public function setPluginServices(array $pluginServices): void
 	{
+		/** @var array{hash: string, plugins: array<class-string<Plugin>, array{service: string, type: class-string<Plugin>, name: string, realName: string, baseEntity: string|null, label: string, basePath: string, priority: int, icon: string|null, roles: array<int, string>, privileges: array<int, string>, menuItem: array<string, string|null>|null}>, baseEntityToPlugin: array<class-string, class-string<Plugin>>, baseEntitySimpleToPlugin: array<string, class-string<Plugin>>, nameToType: array<string, class-string>}|null $cache */
 		$cache = $this->cache->load('plugin-info');
-		if ($cache === null || ((string) ($cache['hash'] ?? '')) !== $this->getPluginServicesHash($pluginServices)) {
+		if ($cache === null || $cache['hash'] !== $this->getPluginServicesHash($pluginServices)) {
 			[$plugins, $baseEntityToPlugin, $baseEntitySimpleToPlugin] = $this->processPluginInfo($pluginServices);
 
 			$pluginNameToType = [];
@@ -57,13 +58,14 @@ final class PluginManager
 				$pluginNameToType[$plugin['name']] = $plugin['type'];
 			}
 
-			$this->cache->save('plugin-info', $cache = [
+			$cache = [
 				'hash' => $this->getPluginServicesHash($pluginServices),
 				'plugins' => $plugins,
 				'baseEntityToPlugin' => $baseEntityToPlugin,
 				'baseEntitySimpleToPlugin' => $baseEntitySimpleToPlugin,
 				'nameToType' => $pluginNameToType,
-			]);
+			];
+			$this->cache->save('plugin-info', $cache);
 		}
 
 		$this->pluginInfo = $cache['plugins'];
@@ -95,7 +97,11 @@ final class PluginManager
 			try {
 				$baseEntityExist = class_exists($baseEntity);
 			} catch (\Throwable $e) {
-				throw new \RuntimeException('Base entity "' . $baseEntity . '" is broken: ' . $e->getMessage(), $e->getCode(), $e);
+				throw new \RuntimeException(
+					sprintf('Base entity "%s" is broken: %s', $baseEntity, $e->getMessage()),
+					500,
+					$e,
+				);
 			}
 			if ($baseEntityExist === false) {
 				throw new \InvalidArgumentException('Entity class "' . $baseEntity . '" does not exist or is not autoloadable.');
@@ -137,7 +143,7 @@ final class PluginManager
 
 
 	/**
-	 * @param mixed[] $components
+	 * @param array<int, array{key: string, name: string, implements: class-string, componentClass: class-string, view: string, source: string, position: int, tab: string, params: array<int|string, string|int|float|bool|null>}> $components
 	 * @internal use in DIC
 	 */
 	public function addComponents(array $components): void
@@ -147,7 +153,7 @@ final class PluginManager
 
 
 	/**
-	 * @param mixed[] $component
+	 * @param array{key: string, name: string, implements: class-string, componentClass: class-string, view: string, source: string, position: int, tab: string, params: array<int|string, string|int|float|bool|null>} $component
 	 * @internal use in DIC
 	 */
 	public function addComponent(array $component): void
@@ -157,7 +163,7 @@ final class PluginManager
 
 
 	/**
-	 * @return mixed[]
+	 * @return array<int, array{key: string, name: string, implements: class-string, componentClass: class-string, view: string, source: string, position: int, tab: string, params: array<int|string, string|int|float|bool|null>}>
 	 */
 	public function getComponentsInfo(): array
 	{
@@ -227,7 +233,7 @@ final class PluginManager
 
 
 	/**
-	 * @return mixed[]
+	 * @return array<class-string<Plugin>, array{service: string, type: class-string<Plugin>, name: string, realName: string, baseEntity: string|null, label: string, basePath: string, priority: int, icon: string|null, roles: array<int, string>, privileges: array<int, string>, menuItem: array<string, string|null>|null}>
 	 */
 	public function getPluginInfo(): array
 	{

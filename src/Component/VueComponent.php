@@ -25,15 +25,15 @@ class VueComponent implements PluginComponent
 
 
 	/**
-	 * @param mixed[] $config
+	 * @param array{key: string, name: string, implements: class-string, componentClass: class-string, view: string, source: string, position?: int, tab?: string, params?: array<int|string, mixed>} $config
 	 */
 	public function __construct(array $config)
 	{
-		$this->key = (string) $config['key'];
-		$this->name = (string) $config['name'];
-		$this->tab = (string) ($config['tab'] ?? $config['key']);
-		$this->source = (string) $config['source'];
-		$this->position = (int) ($config['position'] ?? 50);
+		$this->key = $config['key'];
+		$this->name = $config['name'];
+		$this->tab = $config['tab'] ?? $config['key'];
+		$this->source = $config['source'];
+		$this->position = $config['position'] ?? 50;
 
 		$parameters = [];
 		foreach ($config['params'] ?? [] as $parameterName => $parameterValue) {
@@ -42,16 +42,20 @@ class VueComponent implements PluginComponent
 				$parameterValue = null;
 			}
 			if (\is_string($parameterName) === false) {
-				throw new \InvalidArgumentException(
-					'Component "' . $this->key . '": Parameter "' . $parameterName . '" must be '
-					. 'a string, but "' . get_debug_type($parameterName) . '" given.',
-				);
+				throw new \InvalidArgumentException(sprintf(
+					'Component "%s": Parameter "%s" must be a string, but "%s" given.',
+					$this->key,
+					$parameterName,
+					get_debug_type($parameterName),
+				));
 			}
 			if ($parameterValue !== null && is_scalar($parameterValue) === false) {
-				throw new \InvalidArgumentException(
-					'Component "' . $this->key . '": Parameter "' . $parameterName . '" value '
-					. 'must be scalar, but type "' . get_debug_type($parameterValue) . '" given.',
-				);
+				throw new \InvalidArgumentException(sprintf(
+					'Component "%s": Parameter "%s" value must be scalar, but type "%s" given.',
+					$this->key,
+					$parameterName,
+					get_debug_type($parameterValue),
+				));
 			}
 			$parameters[$parameterName] = $parameterValue;
 		}

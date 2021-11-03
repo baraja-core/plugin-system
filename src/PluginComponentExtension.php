@@ -55,13 +55,13 @@ class PluginComponentExtension extends CompilerExtension
 			return;
 		}
 
-		/** @var mixed[] $config */
+		/** @var array<string|int, array<string, mixed>> $config */
 		$config = $this->getConfig();
 
 		$components = [];
 		foreach ($config as $key => $component) {
 			if (\is_string($key) === false) {
-				throw new \RuntimeException('Component name must be string, but "' . $key . '" given.');
+				throw new \RuntimeException('Component name must be string, but "' . $key . '" (' . get_debug_type($key) . ') given.');
 			}
 			if (isset($component['name'], $component['implements'], $component['view'], $component['source']) === false) {
 				throw new \RuntimeException(
@@ -112,8 +112,13 @@ class PluginComponentExtension extends CompilerExtension
 					}
 				} catch (\ReflectionException $e) {
 					throw new \RuntimeException(
-						'Component "' . $key . '": Component class "' . $componentClass . '" is broken: ' . $e->getMessage(),
-						$e->getCode(),
+						sprintf(
+							'Component "%s": Component class "%s" is broken: %s',
+							$key,
+							$componentClass,
+							$e->getMessage(),
+						),
+						500,
 						$e,
 					);
 				}
@@ -138,8 +143,10 @@ class PluginComponentExtension extends CompilerExtension
 					. 'path "' . $source . '" given.',
 				);
 			}
+			$componentParameters = $component['params'] ?? [];
+			assert(is_array($componentParameters));
 			$params = [];
-			foreach ($component['params'] ?? [] as $parameter) {
+			foreach ($componentParameters as $parameter) {
 				if (is_array($parameter) && count($parameter) === 1) {
 					$parameterName = array_keys($parameter)[0] ?? throw new \RuntimeException('Broken parameter.');
 					$parameterValue = array_values($parameter)[0] ?? null;
@@ -170,15 +177,21 @@ class PluginComponentExtension extends CompilerExtension
 				}
 				$params[Strings::firstLower((string) $parameterName)] = $parameterValue;
 			}
+			$tab = $component['tab'] ?? $key;
+			$position = $component['position'] ?? 1;
+			$componentClass = $component['componentClass'] ?? VueComponent::class;
+			assert(is_string($tab));
+			assert(is_int($position));
+			assert(is_string($componentClass));
 			$components[] = (new ComponentDIDefinition(
 				key: $key,
 				name: trim(trim($name) === '' ? $key : $name),
 				implements: $implements,
-				componentClass: $component['componentClass'] ?? VueComponent::class,
+				componentClass: $componentClass,
 				view: $view,
 				source: $source,
-				position: (int) ($component['position'] ?? 1),
-				tab: (string) ($component['tab'] ?? $key),
+				position: $position,
+				tab: $tab,
 				params: $params,
 			))->toArray();
 		}
