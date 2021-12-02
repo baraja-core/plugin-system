@@ -459,7 +459,8 @@ final class PluginManager
 				throw new \RuntimeException('Privilege can not be empty string.');
 			}
 			if (preg_match('/^([a-z]+)([A-Z])([a-z]*)$/', $privilege, $parser)) {
-				throw new \RuntimeException(sprintf('Privilege "%s" does not match valid format (can not use camelCase). Did you mean "%s-%s"?',
+				throw new \RuntimeException(sprintf(
+					'Privilege "%s" does not match valid format (can not use camelCase). Did you mean "%s-%s"?',
 					$privilege,
 					$parser[1],
 					strtolower($parser[2]) . $parser[3]
