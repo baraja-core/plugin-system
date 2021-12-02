@@ -14,10 +14,35 @@ use Nette\Utils\Strings;
 
 final class PluginManager
 {
-	/** @var array<int, array{key: string, name: string, implements: class-string, componentClass: class-string, view: string, source: string, position: int, tab: string, params: array<int|string, string|int|float|bool|null>}> */
+	/** @var array<int, array{
+	 *     key: string,
+	 *     name: string,
+	 *     implements: class-string,
+	 *     componentClass: class-string,
+	 *     view: string,
+	 *     source: string,
+	 *     position: int,
+	 *     tab: string,
+	 *     params: array<int|string, string|int|float|bool|null>
+	 * }>
+	 */
 	private array $components = [];
 
-	/** @var array<class-string<Plugin>, array{service: string, type: class-string<Plugin>, name: string, realName: string, baseEntity: string|null, label: string, basePath: string, priority: int, icon: string|null, roles: array<int, string>, privileges: array<int, string>, menuItem: array<string, string|null>|null}>|null */
+	/** @var array<class-string<Plugin>, array{
+	 *     service: string,
+	 *     type: class-string<Plugin>,
+	 *     name: string,
+	 *     realName: string,
+	 *     baseEntity: string|null,
+	 *     label: string,
+	 *     basePath: string,
+	 *     priority: int,
+	 *     icon: string|null,
+	 *     roles: array<int, string>,
+	 *     privileges: array<int, string>,
+	 *     menuItem: array<string, string|null>|null
+	 * }>|null
+	 */
 	private ?array $pluginInfo = null;
 
 	/** @var array<string, string> */
@@ -143,27 +168,65 @@ final class PluginManager
 
 
 	/**
-	 * @param array<int, array{key: string, name: string, implements: class-string, componentClass: class-string, view: string, source: string, position: int, tab: string, params: array<int|string, string|int|float|bool|null>}> $components
+	 * @param array<int, array{
+	 *     key: string,
+	 *     name: string,
+	 *     implements: class-string,
+	 *     componentClass: class-string,
+	 *     view: string,
+	 *     source: string,
+	 *     position: int|null,
+	 *     tab: string,
+	 *     params: array<int|string, string|int|float|bool|null>|null
+	 * }> $components
 	 * @internal use in DIC
 	 */
 	public function addComponents(array $components): void
 	{
-		$this->components = array_merge($this->components, $components);
+		foreach ($components as $component) {
+			$this->addComponent($component);
+		}
 	}
 
 
 	/**
-	 * @param array{key: string, name: string, implements: class-string, componentClass: class-string, view: string, source: string, position: int, tab: string, params: array<int|string, string|int|float|bool|null>} $component
+	 * @param array{
+	 *     key: string,
+	 *     name: string,
+	 *     implements: class-string,
+	 *     componentClass: class-string,
+	 *     view: string,
+	 *     source: string,
+	 *     position: int|null,
+	 *     tab: string,
+	 *     params: array<int|string, string|int|float|bool|null>|null
+	 * } $component
 	 * @internal use in DIC
 	 */
 	public function addComponent(array $component): void
 	{
+		if (isset($component['position']) === false) {
+			$component['position'] = 0;
+		}
+		if (isset($component['params']) === false) {
+			$component['params'] = [];
+		}
 		$this->components[] = $component;
 	}
 
 
 	/**
-	 * @return array<int, array{key: string, name: string, implements: class-string, componentClass: class-string, view: string, source: string, position: int, tab: string, params: array<int|string, string|int|float|bool|null>}>
+	 * @return array<int, array{
+	 *     key: string,
+	 *     name: string,
+	 *     implements: class-string,
+	 *     componentClass: class-string,
+	 *     view: string,
+	 *     source: string,
+	 *     position: int,
+	 *     tab: string,
+	 *     params: array<int|string, string|int|float|bool|null>
+	 * }>
 	 */
 	public function getComponentsInfo(): array
 	{
@@ -192,7 +255,7 @@ final class PluginManager
 	public function getPluginByName(string $name): Plugin
 	{
 		if (isset($this->pluginNameToType[$name]) === false) {
-			throw new \RuntimeException('Plugin "' . $name . '" does not exist.', 404);
+			throw new \RuntimeException(sprintf('Plugin "%s" does not exist.', $name), 404);
 		}
 
 		return $this->getPluginByType($this->pluginNameToType[$name]);
@@ -233,7 +296,20 @@ final class PluginManager
 
 
 	/**
-	 * @return array<class-string<Plugin>, array{service: string, type: class-string<Plugin>, name: string, realName: string, baseEntity: string|null, label: string, basePath: string, priority: int, icon: string|null, roles: array<int, string>, privileges: array<int, string>, menuItem: array<string, string|null>|null}>
+	 * @return array<class-string<Plugin>, array{
+	 *     service: string,
+	 *     type: class-string<Plugin>,
+	 *     name: string,
+	 *     realName: string,
+	 *     baseEntity: string|null,
+	 *     label: string,
+	 *     basePath: string,
+	 *     priority: int,
+	 *     icon: string|null,
+	 *     roles: array<int, string>,
+	 *     privileges: array<int, string>,
+	 *     menuItem: array<string, string|null>|null
+	 * }>
 	 */
 	public function getPluginInfo(): array
 	{
@@ -279,7 +355,24 @@ final class PluginManager
 
 	/**
 	 * @param array<int, string> $pluginServices
-	 * @return array{0: array<class-string<Plugin>, array{service: string, type: class-string<Plugin>, name: string, realName: string, baseEntity: string|null, label: string, basePath: string, priority: int, icon: string|null, roles: array<int, string>, privileges: array<int, string>, menuItem: array<string, string|null>|null}>, 1: array<class-string, class-string<Plugin>>, 2: array<string, class-string<Plugin>>}
+	 * @return array{
+	 *     0: array<class-string<Plugin>, array{
+	 *         service: string,
+	 *         type: class-string<Plugin>,
+	 *         name: string,
+	 *         realName: string,
+	 *         baseEntity: string|null,
+	 *         label: string,
+	 *         basePath: string,
+	 *         priority: int,
+	 *         icon: string|null,
+	 *         roles: array<int, string>,
+	 *         privileges: array<int, string>,
+	 *         menuItem: array<string, string|null>|null
+	 *     }>,
+	 *     1: array<class-string, class-string<Plugin>>,
+	 *     2: array<string, class-string<Plugin>>
+	 * }
 	 */
 	private function processPluginInfo(array $pluginServices): array
 	{
@@ -303,12 +396,14 @@ final class PluginManager
 				if (preg_match('/\\\\([^\\\\]+)$/', $baseEntity, $baseEntityParser)) {
 					$route = (string) $baseEntityParser[1];
 					if (isset($baseEntitySimpleToPlugin[$route]) === true) {
-						throw new \RuntimeException(
-							'Plugin compile error: Base entity "' . $route . '" already exist.' . "\n\n"
-							. 'How to solve this issue: Plugin "' . $type . '" is not compatible with plugin "'
-							. $baseEntitySimpleToPlugin[$route] . '".' . "\n\n"
+						throw new \RuntimeException(sprintf(
+							'Plugin compile error: Base entity "%s" already exist.' . "\n\n"
+							. 'How to solve this issue: Plugin "%s" is not compatible with plugin "%s".' . "\n\n"
 							. 'One of the plugins should be refactored to make routing unambiguous.',
-						);
+							$route,
+							$type,
+							$baseEntitySimpleToPlugin[$route],
+						));
 					}
 					$baseEntitySimpleToPlugin[$route] = $type;
 				}
@@ -345,7 +440,7 @@ final class PluginManager
 	{
 		foreach ($roles as $role) {
 			if (is_string($role) === false) {
-				throw new \RuntimeException('Role must be a string, but type "' . \gettype($role) . '" given.');
+				throw new \RuntimeException(sprintf('Role must be a string, but type "%s" given.', get_debug_type($role)));
 			}
 		}
 	}
@@ -358,16 +453,20 @@ final class PluginManager
 	{
 		foreach ($privileges as $privilege) {
 			if (is_string($privilege) === false) {
-				throw new \RuntimeException('Privilege must be a string, but type "' . \gettype($privilege) . '" given.');
+				throw new \RuntimeException(sprintf('Privilege must be a string, but type "%s" given.', get_debug_type($privilege)));
 			}
 			if ($privilege === '') {
 				throw new \RuntimeException('Privilege can not be empty string.');
 			}
 			if (preg_match('/^([a-z]+)([A-Z])([a-z]*)$/', $privilege, $parser)) {
-				throw new \RuntimeException('Privilege "' . $privilege . '" does not match valid format (can not use camelCase). Did you mean "' . $parser[1] . '-' . strtolower($parser[2]) . $parser[3] . '"?');
+				throw new \RuntimeException(sprintf('Privilege "%s" does not match valid format (can not use camelCase). Did you mean "%s-%s"?',
+					$privilege,
+					$parser[1],
+					strtolower($parser[2]) . $parser[3]
+				));
 			}
 			if (strtolower($privilege) !== $privilege) {
-				throw new \RuntimeException('Privilege "' . $privilege . '" must use lower characters only. Did you mean "' . strtolower($privilege) . '"?');
+				throw new \RuntimeException(sprintf('Privilege "%s" must use lower characters only. Did you mean "%s"?', $privilege, strtolower($privilege)));
 			}
 		}
 	}
