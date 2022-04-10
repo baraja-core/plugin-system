@@ -83,7 +83,7 @@ class PluginComponentExtension extends CompilerExtension
 			if (isset($component['componentClass']) === true) {
 				$componentClass = $component['componentClass'];
 				if (\is_string($componentClass) === false || \class_exists($componentClass) === false) {
-					throw new \RuntimeException(sprintf('Component "%s": Class "%s" does not exist.', $key, $componentClass));
+					throw new \RuntimeException(sprintf('Component "%s": Class "%s" does not exist.', $key, print_r($componentClass, true)));
 				}
 				try {
 					$componentClassRef = new \ReflectionClass($componentClass);
