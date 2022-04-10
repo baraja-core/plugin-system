@@ -48,8 +48,10 @@ class PluginComponentExtension extends CompilerExtension
 		/** @var ServiceDefinition $pluginManager */
 		$pluginManager = $builder->getDefinitionByType(PluginManager::class);
 
-		$builder->addDefinition($this->prefix('cmsPluginPanel'))
-			->setFactory(CmsPluginPanel::class);
+		if (class_exists(Debugger::class, false)) {
+			$builder->addDefinition($this->prefix('cmsPluginPanel'))
+				->setFactory(CmsPluginPanel::class);
+		}
 
 		if (PHP_SAPI === 'cli') {
 			return;
