@@ -14,10 +14,10 @@
 		"nette/caching": "^3.1",
 		"nette/di": "^3.0",
 		"nette/http": "^3.0",
-		"tracy/tracy": "^2.8",
 		"baraja-core/service-method-invoker": "^2.0"
 	},
 	"require-dev": {
+		"tracy/tracy": "^2.8",
 		"phpstan/phpstan": "^1.0",
 		"phpstan/phpstan-nette": "^1.0",
 		"spaze/phpstan-disallowed-calls": "^2.0",
