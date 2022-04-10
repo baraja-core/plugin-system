@@ -61,51 +61,38 @@ class PluginComponentExtension extends CompilerExtension
 		$components = [];
 		foreach ($config as $key => $component) {
 			if (\is_string($key) === false) {
-				throw new \RuntimeException('Component name must be string, but "' . $key . '" (' . get_debug_type($key) . ') given.');
+				throw new \RuntimeException(sprintf('Component name must be string, but "%s" (%s) given.', $key, get_debug_type($key)));
 			}
 			if (isset($component['name'], $component['implements'], $component['view'], $component['source']) === false) {
 				throw new \RuntimeException(
-					'Component definition for component "' . $key . '" is invalid. '
+					sprintf('Component definition for component "%s" is invalid. ', $key)
 					. 'Did you defined "name", "implements", "view" and "source"?',
 				);
 			}
 			$name = $component['name'];
 			if (is_string($name) === false) {
-				throw new \RuntimeException(
-					'Component "' . $key . '": Section "name" must be string, '
-					. 'but "' . get_debug_type($name) . '" given.',
-				);
+				throw new \RuntimeException(sprintf('Component "%s": Section "name" must be string, but "%s" given.', $key, get_debug_type($name)));
 			}
 			$implements = $component['implements'];
 			if (is_string($implements) === false) {
-				throw new \RuntimeException(
-					'Component "' . $key . '": Section "implements" must be string, '
-					. 'but "' . get_debug_type($implements) . '" given.',
-				);
+				throw new \RuntimeException(sprintf('Component "%s": Section "implements" must be string, but "%s" given.', $key, get_debug_type($implements)));
 			}
 			if (\class_exists($implements) === false && \interface_exists($implements) === false) {
-				throw new \RuntimeException(
-					'Component "' . $key . '": Class or interface "' . $implements . '" does not exist.',
-				);
+				throw new \RuntimeException(sprintf('Component "%s": Class or interface "%s" does not exist.', $key, $implements));
 			}
 			if (isset($component['componentClass']) === true) {
 				$componentClass = $component['componentClass'];
 				if (\is_string($componentClass) === false || \class_exists($componentClass) === false) {
-					throw new \RuntimeException(
-						'Component "' . $key . '": Class "' . $componentClass . '" does not exist.',
-					);
+					throw new \RuntimeException(sprintf('Component "%s": Class "%s" does not exist.', $key, $componentClass));
 				}
 				try {
 					$componentClassRef = new \ReflectionClass($componentClass);
 					if ($componentClassRef->implementsInterface(PluginComponent::class) === false) {
-						throw new \RuntimeException(
-							'Component "' . $key . '": Component class "' . $componentClass . '" '
-							. 'must implement interface "' . PluginComponent::class . '".',
-						);
+						throw new \RuntimeException(sprintf('Component "%s": Component class "%s" must implement interface "%s".', $key, $componentClass, PluginComponent::class));
 					}
 					if ($componentClassRef->isInstantiable() === false) {
 						throw new \RuntimeException(
-							'Component "' . $key . '": Component class "' . $componentClass . '" must be instantiable.'
+							sprintf('Component "%s": Component class "%s" must be instantiable.', $key, $componentClass)
 							. "\n" . 'Did you implement it as class without abstract mode?'
 							. "\n" . 'Hint: To solve this issue mark class as final with public constructor.',
 						);
@@ -125,23 +112,14 @@ class PluginComponentExtension extends CompilerExtension
 			}
 			$view = $component['view'];
 			if (is_string($view) === false) {
-				throw new \RuntimeException(
-					'Component "' . $key . '": Section "view" must be string, '
-					. 'but "' . get_debug_type($view) . '" given.',
-				);
+				throw new \RuntimeException(sprintf('Component "%s": Section "view" must be string, but "%s" given.', $key, get_debug_type($view)));
 			}
 			$source = $component['source'];
 			if (is_string($source) === false) {
-				throw new \RuntimeException(
-					'Component "' . $key . '": Section "source" must be string, '
-					. 'but "' . get_debug_type($view) . '" given.',
-				);
+				throw new \RuntimeException(sprintf('Component "%s": Section "source" must be string, but "%s" given.', $key, get_debug_type($view)));
 			}
 			if (\is_file($source) === false) {
-				throw new \RuntimeException(
-					'Component "' . $key . '": Source file does not exist, '
-					. 'path "' . $source . '" given.',
-				);
+				throw new \RuntimeException(sprintf('Component "%s": Source file does not exist, path "%s" given.', $key, $source));
 			}
 			$componentParameters = $component['params'] ?? [];
 			assert(is_array($componentParameters));
@@ -153,11 +131,12 @@ class PluginComponentExtension extends CompilerExtension
 					if (str_starts_with($parameterName, '?')) {
 						$parameterName = str_replace('?', '', $parameterName);
 						if ($parameterValue !== null) { // case '?id = null'
-							throw new \RuntimeException(
-								'Component "' . $key . '": Parameter default type mishmash: '
-								. 'Parameter "' . $parameterName . '" can not implement default value '
-								. '"' . get_debug_type($parameterValue) . '" and be both nullable.',
-							);
+							throw new \RuntimeException(sprintf(
+								'Component "%s": Parameter default type mishmash: Parameter "%s" can not implement default value "%s" and be both nullable.',
+								$key,
+								$parameterName,
+								get_debug_type($parameterValue),
+							));
 						}
 					}
 				} elseif (is_string($parameter)) {
@@ -169,11 +148,12 @@ class PluginComponentExtension extends CompilerExtension
 						$parameterValue = '#REQUIRED#';
 					}
 				} else {
-					throw new \RuntimeException(
-						'Component "' . $key . '": Parameter "'
-						. (is_scalar($parameter) ? $parameter : get_debug_type($parameter))
-						. '" must be a string, but "' . \get_debug_type($view) . '" given.',
-					);
+					throw new \RuntimeException(sprintf(
+						'Component "%s": Parameter "%s" must be a string, but "%s" given.',
+						$key,
+						is_scalar($parameter) ? $parameter : get_debug_type($parameter),
+						get_debug_type($view),
+					));
 				}
 				$params[Strings::firstLower((string) $parameterName)] = $parameterValue;
 			}
@@ -219,7 +199,7 @@ class PluginComponentExtension extends CompilerExtension
 			try {
 				if (!class_exists($class) && !interface_exists($class) && !trait_exists($class)) {
 					trigger_error(
-						'Class "' . $class . '" was found, but it cannot be loaded by autoloading.'
+						sprintf('Class "%s" was found, but it cannot be loaded by autoloading.', $class)
 						. "\n" . 'More information: https://php.baraja.cz/autoloading-trid',
 					);
 					continue;
@@ -236,7 +216,7 @@ class PluginComponentExtension extends CompilerExtension
 					// Silence is golden.
 				}
 				try {
-					trigger_error('Class "' . $class . '" is broken: ' . $e->getMessage());
+					trigger_error(sprintf('Class "%s" is broken: %s', $class, $e->getMessage()));
 				} catch (\Throwable) {
 					// Silence is golden.
 				}
@@ -244,7 +224,7 @@ class PluginComponentExtension extends CompilerExtension
 			}
 			$rc = new \ReflectionClass($class);
 			if ($rc->isInstantiable() && $rc->implementsInterface(Plugin::class)) {
-				$plugin = $builder->addDefinition($this->prefix('plugin') . '.' . str_replace('\\', '.', $class))
+				$plugin = $builder->addDefinition(sprintf('%s.%s', $this->prefix('plugin'), str_replace('\\', '.', $class)))
 					->setFactory($class)
 					->setType($class)
 					->setAutowired($class)
@@ -254,10 +234,11 @@ class PluginComponentExtension extends CompilerExtension
 				if ($rc->hasMethod('setContext') === true) {
 					$plugin->addSetup('?->setContext(?)', ['@self', '@' . Context::class]);
 				} else {
-					trigger_error(
-						'Possible bug: Plugin "' . $class . '" do not extends "' . BasePlugin::class . '". '
-						. 'Please check your dependency tree.',
-					);
+					trigger_error(sprintf(
+						'Possible bug: Plugin "%s" do not extends "%s". Please check your dependency tree.',
+						$class,
+						BasePlugin::class,
+					));
 				}
 			}
 		}
