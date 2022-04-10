@@ -41,17 +41,13 @@ class PluginComponentExtension extends CompilerExtension
 	 */
 	public function beforeCompile(): void
 	{
-		self::defineBasicServices($builder = $this->getContainerBuilder());
+		$builder = $this->getContainerBuilder();
+		self::defineBasicServices($builder);
 
 		$pluginServices = $this->createPluginServices($builder);
 
 		/** @var ServiceDefinition $pluginManager */
 		$pluginManager = $builder->getDefinitionByType(PluginManager::class);
-
-		if (class_exists(Debugger::class, false)) {
-			$builder->addDefinition($this->prefix('cmsPluginPanel'))
-				->setFactory(CmsPluginPanel::class);
-		}
 
 		if (PHP_SAPI === 'cli') {
 			return;
