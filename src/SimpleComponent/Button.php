@@ -29,7 +29,7 @@ final class Button implements SimpleComponent
 		private string $label,
 		private string $action,
 		private string $target,
-		private ?string $icon = null
+		private ?string $icon = null,
 	) {
 	}
 

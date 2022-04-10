@@ -21,7 +21,7 @@ final class CmsPluginPanel implements IBarPanel
 
 
 	public function __construct(
-		private PluginManager $pluginManager
+		private PluginManager $pluginManager,
 	) {
 	}
 

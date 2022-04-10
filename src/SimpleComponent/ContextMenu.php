@@ -20,7 +20,7 @@ final class ContextMenu implements SimpleComponent
 		private string $action,
 		private ?string $target = null,
 		private bool $active = false,
-		private bool $disabled = false
+		private bool $disabled = false,
 	) {
 	}
 

@@ -25,7 +25,7 @@ final class ComponentDIDefinition
 		private string $source,
 		private int $position = 1,
 		?string $tab = null,
-		array $params = []
+		array $params = [],
 	) {
 		$this->tab = $tab ?? $key;
 		$this->params = $params;

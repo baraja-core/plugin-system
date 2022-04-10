@@ -59,7 +59,7 @@ final class PluginManager
 
 	public function __construct(
 		private Container $container,
-		Storage $storage
+		Storage $storage,
 	) {
 		$this->cache = new Cache($storage, 'baraja-plugin-manager');
 	}
@@ -463,7 +463,7 @@ final class PluginManager
 					'Privilege "%s" does not match valid format (can not use camelCase). Did you mean "%s-%s"?',
 					$privilege,
 					$parser[1],
-					strtolower($parser[2]) . $parser[3]
+					strtolower($parser[2]) . $parser[3],
 				));
 			}
 			if (strtolower($privilege) !== $privilege) {

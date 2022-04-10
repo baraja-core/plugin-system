@@ -9,7 +9,7 @@ final class Breadcrumb implements SimpleComponent
 {
 	public function __construct(
 		private string $label,
-		private ?string $href = null
+		private ?string $href = null,
 	) {
 	}
 

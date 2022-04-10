@@ -35,7 +35,7 @@ final class PluginInfoEntity
 		private ?string $icon,
 		array $roles,
 		array $privileges,
-		?array $menuItem
+		?array $menuItem,
 	) {
 		$this->roles = $roles;
 		$this->privileges = $privileges;
