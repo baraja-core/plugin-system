@@ -131,19 +131,21 @@ final class CmsPluginPanel implements IBarPanel
 				(function (array $params): string {
 					$return = '';
 					foreach ($params as $parameterName => $parameterValue) {
-						if (\is_int($parameterName) && is_string($parameterValue)) {
+						if (is_int($parameterName) && is_string($parameterValue)) {
 							$parameterName = $parameterValue;
 							$parameterValue = null;
 						}
 						$isRequired = $parameterValue === '#REQUIRED#';
 						if ($isRequired || $parameterValue !== null) {
 							$item = '<span style="color:#555;border:1px dashed #aaa" title="'
-								. ($isRequired ? 'required' : 'default value: ' . $this->escapeHtmlAttr($parameterValue))
-								. '">'
-								. htmlspecialchars($parameterName)
+								. ($isRequired
+									? 'required'
+									: 'default value: ' . $this->escapeHtmlAttr((string) $parameterValue)
+								) . '">'
+								. htmlspecialchars((string) $parameterName)
 								. '</span>';
 						} else {
-							$item = htmlspecialchars($parameterName);
+							$item = htmlspecialchars((string) $parameterName);
 						}
 
 						$return .= ($return ? ', ' : '') . $item;

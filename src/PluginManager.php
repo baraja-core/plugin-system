@@ -416,7 +416,7 @@ final class PluginManager
 				'realName' => $plugin->getName(),
 				'baseEntity' => $baseEntity,
 				'label' => $plugin->getLabel(),
-				'basePath' => \dirname((string) $ref->getFileName()),
+				'basePath' => dirname((string) $ref->getFileName()),
 				'priority' => $plugin->getPriority(),
 				'icon' => $plugin->getIcon(),
 				'roles' => $roles,

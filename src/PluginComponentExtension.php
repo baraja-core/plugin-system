@@ -58,7 +58,7 @@ class PluginComponentExtension extends CompilerExtension
 
 		$components = [];
 		foreach ($config as $key => $component) {
-			if (\is_string($key) === false) {
+			if (is_string($key) === false) {
 				throw new \RuntimeException(sprintf('Component name must be string, but "%s" (%s) given.', $key, get_debug_type($key)));
 			}
 			if (isset($component['name'], $component['implements'], $component['view'], $component['source']) === false) {
@@ -75,12 +75,12 @@ class PluginComponentExtension extends CompilerExtension
 			if (is_string($implements) === false) {
 				throw new \RuntimeException(sprintf('Component "%s": Section "implements" must be string, but "%s" given.', $key, get_debug_type($implements)));
 			}
-			if (\class_exists($implements) === false && \interface_exists($implements) === false) {
+			if (class_exists($implements) === false && interface_exists($implements) === false) {
 				throw new \RuntimeException(sprintf('Component "%s": Class or interface "%s" does not exist.', $key, $implements));
 			}
 			if (isset($component['componentClass']) === true) {
 				$componentClass = $component['componentClass'];
-				if (\is_string($componentClass) === false || \class_exists($componentClass) === false) {
+				if (is_string($componentClass) === false || class_exists($componentClass) === false) {
 					throw new \RuntimeException(sprintf('Component "%s": Class "%s" does not exist.', $key, print_r($componentClass, true)));
 				}
 				try {
@@ -116,7 +116,7 @@ class PluginComponentExtension extends CompilerExtension
 			if (is_string($source) === false) {
 				throw new \RuntimeException(sprintf('Component "%s": Section "source" must be string, but "%s" given.', $key, get_debug_type($view)));
 			}
-			if (\is_file($source) === false) {
+			if (is_file($source) === false) {
 				throw new \RuntimeException(sprintf('Component "%s": Source file does not exist, path "%s" given.', $key, $source));
 			}
 			$componentParameters = $component['params'] ?? [];
